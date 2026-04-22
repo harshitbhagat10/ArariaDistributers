@@ -44,11 +44,16 @@ const tabMap={dash:0,inv:1,bill:2,hist:3,report:4,staff:5,admin:6,perf:7,profile
 
 function showTab(t,el,skipHistory){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   D('tab-'+t).classList.add('active');
-  const tabs=document.querySelectorAll('.tab');
-  if(el)el.classList.add('active');
-  else if(tabMap[t]!=null && tabs[tabMap[t]]) tabs[tabMap[t]].classList.add('active');
+  // Sync desktop tabs
+  document.querySelectorAll('.tabs .tab').forEach(b=>{
+    b.classList.toggle('active',b.getAttribute('data-tab')===t);
+  });
+  // Sync mobile bottom nav
+  document.querySelectorAll('.mnav-btn').forEach(b=>{
+    b.classList.toggle('active',b.getAttribute('data-tab')===t);
+  });
+  closeMobileMenu();
   if(t==='dash')renderDash();
   if(t==='inv'){populateCatFilter();renderInv();}
   if(t==='bill'){genInvNo();}
@@ -58,11 +63,28 @@ function showTab(t,el,skipHistory){
   if(t==='admin'){renderAdjLog();renderLowStockList();}
   if(t==='perf'){renderStaffPerf();}
   if(t==='profile'){renderProfile();}
-  // Push tab into browser history so back/forward buttons work
   if(!skipHistory){
     history.pushState({tab:t},'',' #'+t);
   }
 }
+
+// Mobile bottom nav menu
+function toggleMobileMenu(){
+  const m=document.getElementById('mobile-menu');
+  m.classList.toggle('open');
+}
+function closeMobileMenu(){
+  const m=document.getElementById('mobile-menu');
+  if(m)m.classList.remove('open');
+}
+// Close menu when tapping outside
+document.addEventListener('click',function(e){
+  const menu=document.getElementById('mobile-menu');
+  const moreBtn=document.querySelector('.mnav-more');
+  if(menu && menu.classList.contains('open') && !menu.contains(e.target) && !moreBtn.contains(e.target)){
+    menu.classList.remove('open');
+  }
+});
 
 // Handle browser back/forward buttons
 window.addEventListener('popstate',function(e){
@@ -305,6 +327,25 @@ function renderHist(){
     <td style="white-space:nowrap">${currentUser&&currentUser.role==='admin'?`<button class="btn btp" onclick="openEditSale('${s.id}')" style="padding:2px 8px;font-size:10px" title="Edit sale">&#9998;</button> <button class="btn btd" onclick="deleteSale('${s.id}')" style="padding:2px 8px;font-size:10px" title="Delete sale &amp; restore stock">&#128465;</button>`:''}</td>
   </tr>`).join('');
   if(!slice.length)D('hist-body').innerHTML='<tr><td colspan="13" style="text-align:center;color:#94a3b8;padding:24px">No sales found.</td></tr>';
+  // Mobile card view
+  D('hist-cards').innerHTML=slice.length?slice.map(s=>`<div class="sale-card">
+    <div class="sc-head">
+      <div><span class="sc-inv">${s.id}</span>${s.gstBillNo?'<span class="sc-gst">'+s.gstBillNo+'</span>':''}</div>
+      <span class="badge" style="background:#eff6ff;color:#1d4ed8;font-size:10px;padding:3px 8px">${s.payment}</span>
+    </div>
+    <div class="sc-customer">${s.customer}${s.phone?' &bull; '+s.phone:''}</div>
+    <div class="sc-items">${s.items.map(i=>'<span class="sc-chip">'+i.name+(i.qty>1?' x'+i.qty:'')+'</span>').join('')}</div>
+    <div class="sc-nums">
+      <div><span class="sc-lbl">Total</span><span class="sc-val">${fmt(s.total)}</span></div>
+      <div><span class="sc-lbl">Profit</span><span class="sc-val sc-profit">${fmt(s.profit)}</span></div>
+      ${s.gstAmt?'<div><span class="sc-lbl">GST</span><span class="sc-val">'+fmt(s.gstAmt)+'</span></div>':''}
+    </div>
+    <div class="sc-foot">
+      <span class="sc-date">${fmtDT(s.date)}</span>
+      <span class="sc-sold">${s.soldBy?s.soldBy.name:''}</span>
+    </div>
+    ${currentUser&&currentUser.role==='admin'?'<div class="sc-actions"><button class="btn btp" onclick="openEditSale(\''+s.id+'\')" style="flex:1">&#9998; Edit</button><button class="btn btd" onclick="deleteSale(\''+s.id+'\')" style="flex:1">&#128465; Delete</button></div>':''}
+  </div>`).join(''):'<div style="text-align:center;color:#94a3b8;padding:32px">No sales found.</div>';
   D('hist-pg').innerHTML=`<button class="btn" onclick="histPage=Math.max(1,histPage-1);renderHist()" ${histPage<=1?'disabled':''}>&#8592; Prev</button><span>Page ${histPage}/${pages} &bull; ${rows.length} sales</span><button class="btn" onclick="histPage=Math.min(${pages},histPage+1);renderHist()" ${histPage>=pages?'disabled':''}>Next &#8594;</button>`;
 }
 

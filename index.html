@@ -73,16 +73,32 @@
   </div>
 </div>
 
-<!-- ==================== TABS ==================== -->
+<!-- ==================== TABS (DESKTOP) ==================== -->
 <div class="tabs">
-  <button class="tab active" onclick="showTab('dash',this)">Dashboard</button>
-  <button class="tab" onclick="showTab('inv',this)">Inventory</button>
-  <button class="tab" onclick="showTab('bill',this)">New Sale</button>
-  <button class="tab" onclick="showTab('hist',this)">Sales History</button>
-  <button class="tab" onclick="showTab('report',this)">Daily Reports</button>
-  <button class="tab" onclick="showTab('staff',this)">Staff</button>
-  <button class="tab" onclick="showTab('admin',this)">Admin</button>
-  <button class="tab" onclick="showTab('perf',this)">Performance</button>
+  <button class="tab active" onclick="showTab('dash',this)" data-tab="dash"><span class="tab-icon">&#127968;</span><span class="tab-label">Dashboard</span></button>
+  <button class="tab" onclick="showTab('inv',this)" data-tab="inv"><span class="tab-icon">&#128230;</span><span class="tab-label">Inventory</span></button>
+  <button class="tab" onclick="showTab('bill',this)" data-tab="bill"><span class="tab-icon">&#128176;</span><span class="tab-label">New Sale</span></button>
+  <button class="tab" onclick="showTab('hist',this)" data-tab="hist"><span class="tab-icon">&#128196;</span><span class="tab-label">History</span></button>
+  <button class="tab" onclick="showTab('report',this)" data-tab="report"><span class="tab-icon">&#128202;</span><span class="tab-label">Reports</span></button>
+  <button class="tab" onclick="showTab('staff',this)" data-tab="staff"><span class="tab-icon">&#128101;</span><span class="tab-label">Staff</span></button>
+  <button class="tab" onclick="showTab('admin',this)" data-tab="admin"><span class="tab-icon">&#9881;</span><span class="tab-label">Admin</span></button>
+  <button class="tab" onclick="showTab('perf',this)" data-tab="perf"><span class="tab-icon">&#127942;</span><span class="tab-label">Perf</span></button>
+</div>
+
+<!-- ==================== MOBILE BOTTOM NAV ==================== -->
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mnav-btn active" onclick="showTab('dash',this)" data-tab="dash"><span class="mnav-icon">&#127968;</span><span class="mnav-text">Home</span></button>
+  <button class="mnav-btn" onclick="showTab('bill',this)" data-tab="bill"><span class="mnav-icon">&#128176;</span><span class="mnav-text">Sale</span></button>
+  <button class="mnav-btn" onclick="showTab('hist',this)" data-tab="hist"><span class="mnav-icon">&#128196;</span><span class="mnav-text">History</span></button>
+  <button class="mnav-btn" onclick="showTab('staff',this)" data-tab="staff"><span class="mnav-icon">&#128101;</span><span class="mnav-text">Staff</span></button>
+  <button class="mnav-btn mnav-more" onclick="toggleMobileMenu()" data-tab="more"><span class="mnav-icon">&#9776;</span><span class="mnav-text">More</span></button>
+</div>
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mmenu-item" onclick="showTab('inv');closeMobileMenu()">&#128230; Inventory</button>
+  <button class="mmenu-item" onclick="showTab('report');closeMobileMenu()">&#128202; Daily Reports</button>
+  <button class="mmenu-item" onclick="showTab('admin');closeMobileMenu()">&#9881; Admin</button>
+  <button class="mmenu-item" onclick="showTab('perf');closeMobileMenu()">&#127942; Performance</button>
+  <button class="mmenu-item" onclick="showTab('profile');closeMobileMenu()">&#128100; My Profile</button>
 </div>
 
 <div class="content">
@@ -242,15 +258,16 @@
     </select>
     <button class="btn bte" onclick="exportSalesXLSX()">Export Sales (Excel)</button>
   </div>
-  <div style="overflow-x:auto">
+  <div class="hist-table-wrap" style="overflow-x:auto">
     <table>
       <thead><tr>
-        <th>Invoice</th><th>GST Bill</th><th></th>Date &amp; Time</th><th>Customer</th><th>Phone</th><th style="width:200px">Items</th>
+        <th>Invoice</th><th>GST Bill</th><th>Date &amp; Time</th><th>Customer</th><th>Phone</th><th style="width:200px">Items</th>
         <th>Payment</th><th>Subtotal</th><th>GST</th><th>Total</th><th>Profit</th><th>Sold By</th><th>Action</th>
       </tr></thead>
       <tbody id="hist-body"></tbody>
     </table>
   </div>
+  <div class="hist-cards" id="hist-cards"></div>
   <div class="pg" id="hist-pg"></div>
 </div>
 

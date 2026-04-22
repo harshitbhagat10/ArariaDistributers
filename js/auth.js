@@ -148,20 +148,37 @@ function enterApp() {
 }
 
 function applyRoleAccess() {
-  const tabs = document.querySelectorAll('.tab');
   const isAdmin = currentUser && currentUser.role === 'admin';
-  tabs.forEach(tab => {
-    const text = tab.textContent.trim();
-    if (!isAdmin && (text === 'Inventory' || text === 'Daily Reports' || text === 'Admin' || text === 'Staff' || text === 'Performance')) {
+  // Hide desktop tabs for non-admin
+  const adminTabs = ['inv','report','admin','staff','perf'];
+  document.querySelectorAll('.tab[data-tab]').forEach(tab => {
+    if (!isAdmin && adminTabs.includes(tab.getAttribute('data-tab'))) {
       tab.classList.add('hidden-tab');
     } else {
       tab.classList.remove('hidden-tab');
     }
   });
+  // Hide mobile bottom nav items for non-admin
+  document.querySelectorAll('.mnav-btn[data-tab]').forEach(btn => {
+    if (!isAdmin && adminTabs.includes(btn.getAttribute('data-tab'))) {
+      btn.style.display = 'none';
+    } else {
+      btn.style.display = '';
+    }
+  });
+  // Hide mobile menu items for non-admin
+  document.querySelectorAll('.mmenu-item').forEach(item => {
+    const text = item.textContent.trim().toLowerCase();
+    if (!isAdmin && (text.includes('inventory') || text.includes('reports') || text.includes('admin') || text.includes('performance'))) {
+      item.style.display = 'none';
+    } else {
+      item.style.display = '';
+    }
+  });
   if (!isAdmin) {
     const activeSection = document.querySelector('.section.active');
     if (activeSection && (activeSection.id === 'tab-inv' || activeSection.id === 'tab-report' || activeSection.id === 'tab-admin' || activeSection.id === 'tab-staff' || activeSection.id === 'tab-perf')) {
-      showTab('dash', tabs[0]);
+      showTab('dash');
     }
   }
 }
