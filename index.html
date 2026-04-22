@@ -91,7 +91,7 @@
 <div id="tab-dash" class="section active">
   <div class="metric-grid" id="dm"></div>
   <div id="da"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+  <div class="dash-2col">
     <div class="card" style="margin:0">
       <div class="card-title">Revenue &mdash; Last 7 Days</div>
       <div class="mini-bar-wrap" id="rev-bars"></div>
@@ -167,7 +167,7 @@
 
 <!-- ==================== BILLING ==================== -->
 <div id="tab-bill" class="section">
-  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px">
+  <div class="bill-grid">
     <div>
       <div class="card">
         <div class="card-title">Add Items to Bill</div>
@@ -265,7 +265,7 @@
       <button class="btn bto" onclick="exportMonthXLSX()">Export Month (Excel)</button>
     </div>
   </div>
-  <div class="metric-grid" id="rep-metrics" style="grid-template-columns:repeat(5,1fr)"></div>
+  <div class="metric-grid rep-metrics" id="rep-metrics"></div>
   <div id="rep-content"></div>
 </div>
 

@@ -271,12 +271,104 @@ tr:hover td{background:var(--primary-light)}
 .att-summary-row:last-child{border-bottom:none}
 .att-count{display:inline-block;min-width:24px;text-align:center;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
 
+/* ==================== INLINE LAYOUT HELPERS ==================== */
+.dash-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.bill-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+.rep-metrics{grid-template-columns:repeat(5,1fr)}
+
 /* ==================== RESPONSIVE ==================== */
-@media(max-width:768px){
+
+/* Tablet */
+@media(max-width:900px){
   .metric-grid{grid-template-columns:repeat(2,1fr)}
+  .rep-metrics{grid-template-columns:repeat(3,1fr)}
   .tw{grid-template-columns:1fr}
   .r4{grid-template-columns:1fr 1fr}
-  .content{padding:12px}
+  .r3{grid-template-columns:1fr 1fr}
+  .dash-2col{grid-template-columns:1fr}
+  .bill-grid{grid-template-columns:1fr}
+  .content{padding:14px}
   .topbar{padding:12px 16px}
-  .tabs{padding:0 12px}
+  .tabs{padding:0 10px}
+}
+
+/* Mobile */
+@media(max-width:640px){
+  .topbar{padding:10px 12px;flex-wrap:wrap;gap:8px}
+  .topbar h1{font-size:14px}
+  .topbar-user{gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .topbar-user span{font-size:10px}
+  .logout-btn{padding:4px 10px;font-size:10px}
+  .theme-toggle{width:28px;height:28px;font-size:13px}
+
+  .tabs{gap:0;padding:0 6px;-webkit-overflow-scrolling:touch}
+  .tab{padding:9px 12px;font-size:11px;flex-shrink:0}
+
+  .content{padding:10px 8px}
+  .section{overflow-x:hidden}
+
+  .metric-grid{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .rep-metrics{grid-template-columns:1fr 1fr}
+  .metric{padding:12px 14px}
+  .mval{font-size:20px}
+
+  .card{padding:14px;margin-bottom:10px;border-radius:var(--radius-sm)}
+  .card-title{font-size:12px;margin-bottom:10px}
+
+  .r2{grid-template-columns:1fr;gap:8px}
+  .r3{grid-template-columns:1fr;gap:8px}
+  .r4{grid-template-columns:1fr 1fr;gap:8px}
+  .tw{grid-template-columns:1fr;gap:10px}
+  .dash-2col{grid-template-columns:1fr;gap:10px}
+  .bill-grid{grid-template-columns:1fr;gap:10px}
+
+  /* Tables scroll horizontally */
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  thead,tbody,tr{display:table;width:100%;table-layout:auto}
+  th,td{padding:7px 8px;font-size:11px}
+
+  /* Toolbar */
+  .tbar{flex-direction:column;align-items:stretch;gap:6px}
+  .sbar{width:100%}
+
+  /* Pagination */
+  .pg{justify-content:center}
+  .pg span{font-size:10px;padding:0 4px}
+
+  /* Billing */
+  .bill-row{grid-template-columns:1fr 40px 70px 60px 20px;gap:4px;font-size:11px}
+
+  /* Receipt */
+  .rcpt{padding:12px}
+  .rl{font-size:11px}
+
+  /* Attendance */
+  .att-row{flex-direction:column;align-items:flex-start;gap:6px;padding:10px 8px}
+  .att-status{flex-wrap:wrap;gap:4px}
+  .att-btn{padding:4px 10px;font-size:10px}
+  .att-summary-row{flex-direction:column;align-items:flex-start;gap:4px}
+
+  /* Staff */
+  .staff-card{flex-direction:column;align-items:flex-start;gap:6px}
+
+  /* Buttons */
+  .btn{padding:7px 12px;font-size:11px}
+
+  /* Auth */
+  .auth-box{padding:28px 20px;width:95vw}
+  .auth-logo h2{font-size:20px}
+  .auth-field input,.auth-field select{padding:9px 12px;font-size:12px}
+  .auth-btn{padding:10px;font-size:12px}
+
+  /* Edit sale modal */
+  #edit-sale-overlay>div{width:95vw;padding:20px 16px}
+}
+
+/* Small phones */
+@media(max-width:380px){
+  .metric-grid{grid-template-columns:1fr}
+  .rep-metrics{grid-template-columns:1fr}
+  .r4{grid-template-columns:1fr}
+  .topbar h1{font-size:13px}
+  .tab{padding:8px 10px;font-size:10px}
 }
