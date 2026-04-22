@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Araria Distributers — Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<!-- ==================== AUTH OVERLAY ==================== -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <h2>Araria Distributers</h2>
+      <p>Sign in to continue</p>
+    </div>
+    <div class="auth-toggle">
+      <button class="active" onclick="switchAuth('login')">Sign In</button>
+      <button onclick="switchAuth('signup')">Create Account</button>
+    </div>
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <div class="auth-field"><label>Username</label><input id="login-user" placeholder="Enter your username" autocomplete="username"></div>
+      <div class="auth-field"><label>Password</label><input id="login-pass" type="password" placeholder="Enter your password" autocomplete="current-password"></div>
+      <button class="auth-btn" onclick="doLogin()">Sign In</button>
+      <div class="auth-msg" id="login-msg"></div>
+      <div class="auth-note">Default Admin &mdash; Username: <strong>admin</strong> &nbsp; Password: <strong>admin123</strong></div>
+    </div>
+    <!-- SIGNUP FORM -->
+    <div id="signup-form" style="display:none">
+      <div class="auth-field"><label>Full Name</label><input id="signup-name" placeholder="Your full name"></div>
+      <div class="auth-field"><label>Username</label><input id="signup-user" placeholder="Choose a username" autocomplete="username"></div>
+      <div class="auth-field"><label>Password</label><input id="signup-pass" type="password" placeholder="Min 6 characters" autocomplete="new-password"></div>
+      <div class="auth-field"><label>Confirm Password</label><input id="signup-pass2" type="password" placeholder="Confirm your password" autocomplete="new-password"></div>
+      <div class="auth-field">
+        <label>Role</label>
+        <select id="signup-role">
+          <option value="staff">Staff</option>
+          <option value="admin">Admin (requires admin code)</option>
+        </select>
+      </div>
+      <div class="auth-field" id="admin-code-field" style="display:none">
+        <label>Admin Authorization Code</label>
+        <input id="signup-admin-code" type="password" placeholder="Enter the admin secret code">
+      </div>
+      <button class="auth-btn" onclick="doSignup()">Create Account</button>
+      <div class="auth-msg" id="signup-msg"></div>
+      <div class="auth-note">Staff accounts can record sales.<br>Admin accounts require authorization code from the owner.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== APP SHELL (hidden until login) ==================== -->
+<div class="app-shell" id="app-shell">
+
+<!-- ==================== TOPBAR ==================== -->
+<div class="topbar">
+  <h1>Araria Distributers</h1>
+  <div class="topbar-user">
+    <span id="connection-status" style="font-size:10px;margin-right:6px"></span>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="theme-btn">&#9790;</button>
+    <span id="topbar-info" style="cursor:pointer" onclick="showTab('profile')"></span>
+    <span class="user-badge" id="topbar-role" style="cursor:pointer" onclick="showTab('profile')"></span>
+    <button class="logout-btn" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<!-- ==================== TABS ==================== -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('dash',this)">Dashboard</button>
+  <button class="tab" onclick="showTab('inv',this)">Inventory</button>
+  <button class="tab" onclick="showTab('bill',this)">New Sale</button>
+  <button class="tab" onclick="showTab('hist',this)">Sales History</button>
+  <button class="tab" onclick="showTab('report',this)">Daily Reports</button>
+  <button class="tab" onclick="showTab('staff',this)">Staff</button>
+  <button class="tab" onclick="showTab('admin',this)">Admin</button>
+  <button class="tab" onclick="showTab('perf',this)">Performance</button>
+</div>
+
+<div class="content">
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="tab-dash" class="section active">
+  <div class="metric-grid" id="dm"></div>
+  <div id="da"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="card" style="margin:0">
+      <div class="card-title">Revenue &mdash; Last 7 Days</div>
+      <div class="mini-bar-wrap" id="rev-bars"></div>
+      <div style="display:flex;gap:5px;margin-top:4px" id="rev-labels"></div>
+    </div>
+    <div class="card" style="margin:0">
+      <div class="card-title">Category Breakdown</div>
+      <div id="cat-breakdown"></div>
+    </div>
+  </div>
+  <div class="card" style="margin:0">
+    <div class="card-title">Top 5 Products by Revenue</div>
+    <div id="top5"></div>
+  </div>
+</div>
+
+<!-- ==================== INVENTORY ==================== -->
+<div id="tab-inv" class="section">
+  <div class="card">
+    <div class="card-title">Add New Product</div>
+    <div class="r2">
+      <div><label>Product Name *</label><input id="pn" placeholder="e.g. Samsung Galaxy S24"></div>
+      <div><label>SKU / Model No.</label><input id="psku" placeholder="e.g. SGS24-256-BK"></div>
+    </div>
+    <div class="r4">
+      <div><label>Category</label>
+        <select id="pcat">
+          <option>Mobile &amp; Tablets</option><option>TV &amp; Display</option><option>Laptops</option>
+          <option>Audio</option><option>Cameras</option><option>Gaming</option>
+          <option>Home Appliances</option><option>Accessories</option><option>Networking</option>
+        </select>
+      </div>
+      <div><label>Brand</label><input id="pbrand" placeholder="Samsung, Apple..."></div>
+      <div><label>Selling Price (&#8377;) *</label><input id="psp" type="number" placeholder="0" min="0"></div>
+      <div><label>Cost Price (&#8377;) *</label><input id="pcp" type="number" placeholder="0" min="0"></div>
+    </div>
+    <div class="r4">
+      <div><label>Opening Stock</label><input id="pst" type="number" placeholder="0" min="0"></div>
+      <div><label>Low Stock Alert</label><input id="palt" type="number" value="5" min="0"></div>
+      <div><label>GST %</label>
+        <select id="pgst"><option>0</option><option>5</option><option>12</option><option selected>18</option><option>28</option></select>
+      </div>
+      <div><label>Warranty (months)</label><input id="pwar" type="number" placeholder="12" min="0"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btp" onclick="addProd()">+ Add Product</button>
+      <button class="btn" onclick="clearPF()">Clear</button>
+      <button class="btn bte" onclick="exportInventory()" style="margin-left:auto">Export Inventory (Excel)</button>
+    </div>
+  </div>
+  <div class="tbar">
+    <input class="sbar" id="isrch" placeholder="Search name, SKU, brand, category..." oninput="renderInv()" style="flex:1">
+    <select class="sbar" onchange="invCatFilter=this.value;invPage=1;renderInv()" id="icat-sel" style="width:auto">
+      <option value="">All Categories</option>
+    </select>
+    <select class="sbar" onchange="invStockFilter=this.value;invPage=1;renderInv()" style="width:auto">
+      <option value="">All Stock</option><option value="ok">In Stock</option>
+      <option value="low">Low Stock</option><option value="out">Out of Stock</option>
+    </select>
+  </div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th style="width:180px">Product</th><th style="width:100px">SKU</th><th>Category</th>
+        <th>Brand</th><th>Sell Price</th><th>Cost</th><th>GST</th><th>Warranty</th>
+        <th style="width:70px">Stock</th><th>Status</th><th style="width:80px">Action</th>
+      </tr></thead>
+      <tbody id="inv-body"></tbody>
+    </table>
+  </div>
+  <div class="pg" id="inv-pg"></div>
+</div>
+
+<!-- ==================== BILLING ==================== -->
+<div id="tab-bill" class="section">
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px">
+    <div>
+      <div class="card">
+        <div class="card-title">Add Items to Bill</div>
+        <div class="r2">
+          <div>
+            <label>Search &amp; Select Product</label>
+            <input id="bsrch" placeholder="Type product name or SKU..." oninput="filterBillProds()" autocomplete="off">
+            <div id="bsugg" class="sugg-box"></div>
+          </div>
+          <div><label>Quantity</label><input id="bqty" type="number" value="1" min="1"></div>
+        </div>
+        <div class="r3">
+          <div><label>Unit Price (&#8377;)</label><input id="bprice" type="number"></div>
+          <div><label>Discount (%)</label><input id="bdisc" type="number" value="0" min="0" max="100" onfocus="this.select()"></div>
+          <div><label>GST (%)</label><input id="bgst" type="number" readonly></div>
+        </div>
+        <button class="btn bts" onclick="addBillItem()" style="width:100%">+ Add to Bill</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Bill Items</div>
+        <div id="bill-list"><p style="color:#94a3b8;padding:8px 0">No items added yet.</p></div>
+        <div id="bill-summary" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title">Customer &amp; Payment</div>
+        <div style="margin-bottom:8px"><label>Customer Name</label><input id="cname" placeholder="Walk-in customer"></div>
+        <div style="margin-bottom:8px"><label>Phone No.</label><input id="cphone" placeholder="+91 98765 43210"></div>
+        <div class="r2" style="margin-bottom:8px">
+          <div><label>Payment Method</label>
+            <select id="cpay"><option>Cash</option><option>UPI</option><option>Card</option><option>EMI</option><option>Cheque</option></select>
+          </div>
+          <div><label>Invoice No.</label><input id="cinv"></div>
+        </div>
+        <div class="r2" style="margin-bottom:8px">
+          <div><label>Bill Type</label>
+            <select id="cbilltype" onchange="toggleGstBillNo()">
+              <option value="non-gst">Non-GST Bill</option>
+              <option value="gst">GST Bill</option>
+            </select>
+          </div>
+          <div id="gst-billno-wrap" style="display:none"><label>GST Bill No.</label><input id="cgstbill"></div>
+        </div>
+        <div id="sold-by-wrap" style="margin-bottom:8px;display:none">
+          <label>Sold By (override)</label>
+          <select id="csoldby" style="width:100%"><option value="">-- Current User --</option></select>
+        </div>
+        <div style="margin-bottom:10px"><label>Notes</label><input id="cnotes" placeholder="Warranty details, special notes..."></div>
+        <button class="btn bts" onclick="completeSale()" style="width:100%;margin-bottom:6px;padding:9px">Complete Sale</button>
+        <button class="btn" onclick="clearBill()" style="width:100%;margin-bottom:6px">Clear Bill</button>
+        <button class="btn bte" onclick="exportLastReceipt()" style="width:100%" id="exp-rcpt" disabled>Export Receipt (Excel)</button>
+      </div>
+      <div id="rcpt-box" style="display:none" class="rcpt"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SALES HISTORY ==================== -->
+<div id="tab-hist" class="section">
+  <div class="tbar">
+    <input class="sbar" id="hsrch" placeholder="Search customer, product, invoice..." oninput="histPage=1;renderHist()" style="flex:1">
+    <select class="sbar" onchange="histFilter=this.value;histPage=1;renderHist()" style="width:auto">
+      <option value="all">All Time</option><option value="today">Today</option>
+      <option value="week">This Week</option><option value="month">This Month</option>
+    </select>
+    <select class="sbar" onchange="histPay=this.value;histPage=1;renderHist()" style="width:auto">
+      <option value="">All Payment</option><option>Cash</option><option>UPI</option><option>Card</option><option>EMI</option>
+    </select>
+    <select class="sbar" id="hist-staff-sel" onchange="histStaff=this.value;histPage=1;renderHist()" style="width:auto">
+      <option value="">All Staff</option>
+    </select>
+    <button class="btn bte" onclick="exportSalesXLSX()">Export Sales (Excel)</button>
+  </div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Invoice</th><th>GST Bill</th><th></th>Date &amp; Time</th><th>Customer</th><th>Phone</th><th style="width:200px">Items</th>
+        <th>Payment</th><th>Subtotal</th><th>GST</th><th>Total</th><th>Profit</th><th>Sold By</th><th>Action</th>
+      </tr></thead>
+      <tbody id="hist-body"></tbody>
+    </table>
+  </div>
+  <div class="pg" id="hist-pg"></div>
+</div>
+
+<!-- ==================== DAILY REPORTS ==================== -->
+<div id="tab-report" class="section">
+  <div class="card">
+    <div class="card-title">Daily Sales Report</div>
+    <div class="tbar" style="margin:0">
+      <input type="date" id="rep-date" style="font-size:12px;padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;color:#1a1a2e">
+      <button class="btn btp" onclick="renderReport()">View Report</button>
+      <button class="btn bte" onclick="exportDayXLSX()">Export Day (Excel)</button>
+      <button class="btn bto" onclick="exportMonthXLSX()">Export Month (Excel)</button>
+    </div>
+  </div>
+  <div class="metric-grid" id="rep-metrics" style="grid-template-columns:repeat(5,1fr)"></div>
+  <div id="rep-content"></div>
+</div>
+
+<!-- ==================== STAFF & ATTENDANCE ==================== -->
+<div id="tab-staff" class="section">
+  <div class="tw">
+    <div>
+      <div class="card">
+        <div class="card-title">&#128197; Mark Attendance &mdash; <span id="att-date-label"></span></div>
+        <div class="tbar" style="margin-bottom:10px">
+          <input type="date" id="att-date" style="font-size:12px;padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;color:#1a1a2e" onchange="renderAttendance()">
+          <button class="btn btp" onclick="renderAttendance()">Load</button>
+          <button class="btn bts" onclick="saveAttendance()">Save Attendance</button>
+          <button class="btn bte" onclick="exportAttendanceXLSX()" style="margin-left:auto">Export (Excel)</button>
+        </div>
+        <div id="att-list"></div>
+        <div id="att-msg" class="auth-msg" style="margin-top:8px"></div>
+      </div>
+      <div class="card" style="margin:0">
+        <div class="card-title">&#128200; Attendance Summary (This Month)</div>
+        <div id="att-summary" style="max-height:300px;overflow-y:auto"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title">&#128101; Manage Staff</div>
+        <div id="staff-list" style="max-height:320px;overflow-y:auto;margin-bottom:10px"></div>
+        <div style="border-top:1px solid #e5e7eb;padding-top:10px">
+          <div class="card-title" style="font-size:12px">Add New Staff</div>
+          <div class="r2">
+            <div><label>Full Name *</label><input id="new-staff-name" placeholder="Staff full name"></div>
+            <div><label>Username *</label><input id="new-staff-user" placeholder="Lowercase, no spaces"></div>
+          </div>
+          <div class="r2">
+            <div><label>Password *</label><input id="new-staff-pass" type="password" placeholder="Min 6 characters"></div>
+            <div><label>Phone</label><input id="new-staff-phone" placeholder="+91 ..."></div>
+          </div>
+          <button class="btn bts" onclick="addStaff()" style="width:100%">+ Add Staff Member</button>
+          <div id="staff-msg" class="auth-msg" style="margin-top:8px"></div>
+        </div>
+      </div>
+      <div class="card" style="margin:0">
+        <div class="card-title">&#128197; Attendance History</div>
+        <div class="tbar" style="margin:0">
+          <select id="att-hist-month" class="sbar" style="width:auto" onchange="renderAttHistory()"></select>
+          <button class="btn bte" onclick="exportMonthAttXLSX()">Export Month</button>
+        </div>
+        <div id="att-history" style="max-height:250px;overflow-y:auto;margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN ==================== -->
+<div id="tab-admin" class="section">
+  <div class="tw">
+    <div>
+      <div class="card">
+        <div class="card-title">&#9998; Manual Stock Adjustment</div>
+        <div style="margin-bottom:8px">
+          <label>Search Product</label>
+          <input id="adj-srch" placeholder="Type product name or SKU..." oninput="filterAdjProds()">
+          <div id="adj-sugg" class="sugg-box"></div>
+        </div>
+        <div id="adj-selected" style="display:none">
+          <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;padding:8px 10px;margin-bottom:8px;font-weight:600;font-size:12px;color:#0369a1" id="adj-name"></div>
+          <div class="r3" style="margin-bottom:8px">
+            <div><label>Current Stock</label><input id="adj-cur" readonly></div>
+            <div><label>Adjustment Type</label>
+              <select id="adj-type">
+                <option value="add">Add Stock (+)</option>
+                <option value="sub">Remove Stock (-)</option>
+                <option value="set">Set Exact Qty</option>
+              </select>
+            </div>
+            <div><label>Quantity</label><input id="adj-qty" type="number" min="1" value="1"></div>
+          </div>
+          <div style="margin-bottom:8px"><label>Reason / Note</label><input id="adj-note" placeholder="e.g. New stock arrived, damaged goods removed..."></div>
+          <button class="btn bts" onclick="applyAdj()">Apply Adjustment</button>
+        </div>
+      </div>
+      <div class="card" style="margin:0">
+        <div class="card-title">Stock Adjustment Log</div>
+        <div id="adj-log" style="max-height:240px;overflow-y:auto"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title">&#8681; Export Data</div>
+        <div class="export-row">
+          <div><div style="font-weight:600;margin-bottom:2px">Full Inventory</div><div style="font-size:11px;color:#64748b">All products, prices, stock levels</div></div>
+          <button class="btn bte" onclick="exportInventory()">Excel</button>
+        </div>
+        <div class="export-row">
+          <div><div style="font-weight:600;margin-bottom:2px">All Sales</div><div style="font-size:11px;color:#64748b">Complete transaction history</div></div>
+          <button class="btn bte" onclick="exportSalesXLSX()">Excel</button>
+        </div>
+        <div class="export-row">
+          <div><div style="font-weight:600;margin-bottom:2px">Low Stock Report</div><div style="font-size:11px;color:#64748b">Products needing reorder</div></div>
+          <button class="btn bto" onclick="exportLowStock()">Excel</button>
+        </div>
+        <div class="export-row">
+          <div><div style="font-weight:600;margin-bottom:2px">Profit Report</div><div style="font-size:11px;color:#64748b">Revenue, cost &amp; profit per product</div></div>
+          <button class="btn bts" onclick="exportProfit()">Excel</button>
+        </div>
+        <div class="export-row">
+          <div><div style="font-weight:600;margin-bottom:2px">Adjustment Log</div><div style="font-size:11px;color:#64748b">All manual stock changes</div></div>
+          <button class="btn" onclick="exportAdjLog()">Excel</button>
+        </div>
+      </div>
+      <div class="card" style="margin:0">
+        <div class="card-title">&#9888; Low Stock Alerts</div>
+        <div id="low-stock-list" style="max-height:240px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== STAFF SALES PERFORMANCE ==================== -->
+<div id="tab-perf" class="section">
+  <div class="card">
+    <div class="card-title">&#127942; Staff Sales Performance</div>
+    <div class="tbar" style="margin:0">
+      <select class="sbar" onchange="perfPeriod=this.value;renderStaffPerf()" style="width:auto">
+        <option value="all">All Time</option>
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+      </select>
+      <button class="btn bte" onclick="exportStaffPerfXLSX()">Export (Excel)</button>
+    </div>
+  </div>
+  <div id="perf-content"></div>
+</div>
+
+<!-- ==================== USER PROFILE ==================== -->
+<div id="tab-profile" class="section">
+  <div id="profile-content"></div>
+</div>
+
+</div>
+
+</div><!-- end app-shell -->
+
+<!-- ==================== EDIT SALE MODAL ==================== -->
+<div id="edit-sale-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)">
+  <div style="background:var(--surface,#fff);border-radius:var(--radius-lg,14px);padding:28px 26px;width:520px;max-width:94vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg,0 10px 25px rgba(0,0,0,.15));border:1px solid var(--border,#e2e8f0)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div style="font-size:15px;font-weight:700;color:var(--text,#1e293b)">&#9998; Edit Sale &mdash; <span id="edit-sale-id" style="color:var(--primary,#6366f1)"></span></div>
+      <button onclick="closeEditSale()" style="border:none;background:none;font-size:22px;cursor:pointer;color:var(--text-muted,#94a3b8);line-height:1">&times;</button>
+    </div>
+    <div class="r2">
+      <div><label>Customer Name</label><input id="es-customer"></div>
+      <div><label>Phone</label><input id="es-phone"></div>
+    </div>
+    <div class="r3">
+      <div><label>Payment Method</label>
+        <select id="es-payment"><option>Cash</option><option>UPI</option><option>Card</option><option>EMI</option><option>Cheque</option></select>
+      </div>
+      <div><label>Bill Type</label>
+        <select id="es-billtype"><option value="non-gst">Non-GST</option><option value="gst">GST</option></select>
+      </div>
+      <div><label>GST Bill No.</label><input id="es-gstbill"></div>
+    </div>
+    <div class="r2">
+      <div><label>Sold By</label><select id="es-soldby" style="width:100%"></select></div>
+      <div><label>Invoice No.</label><input id="es-invno"></div>
+    </div>
+    <div style="margin-bottom:12px"><label>Notes</label><input id="es-notes"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+      <button class="btn" onclick="closeEditSale()">Cancel</button>
+      <button class="btn bts" onclick="saveEditSale()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
