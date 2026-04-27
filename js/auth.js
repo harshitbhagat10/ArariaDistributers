@@ -168,8 +168,8 @@ function applyRoleAccess() {
   });
   // Hide mobile menu items for non-admin
   document.querySelectorAll('.mmenu-item').forEach(item => {
-    const text = item.textContent.trim().toLowerCase();
-    if (!isAdmin && (text.includes('inventory') || text.includes('reports') || text.includes('admin') || text.includes('performance'))) {
+    const tab = item.getAttribute('data-tab');
+    if (!isAdmin && tab && adminTabs.includes(tab)) {
       item.style.display = 'none';
     } else {
       item.style.display = '';

@@ -21,41 +21,40 @@
 <div class="auth-overlay" id="auth-overlay">
   <div class="auth-box">
     <div class="auth-logo">
-      <h2>Araria Distributers</h2>
-      <p>Sign in to continue</p>
+      <h2 data-i18n="auth.title">Araria Distributers</h2>
+      <p data-i18n="auth.subtitle">Sign in to continue</p>
     </div>
     <div class="auth-toggle">
-      <button class="active" onclick="switchAuth('login')">Sign In</button>
-      <button onclick="switchAuth('signup')">Create Account</button>
+      <button class="active" onclick="switchAuth('login')" data-i18n="auth.signin">Sign In</button>
+      <button onclick="switchAuth('signup')" data-i18n="auth.signup">Create Account</button>
     </div>
     <!-- LOGIN FORM -->
     <div id="login-form">
-      <div class="auth-field"><label>Username</label><input id="login-user" placeholder="Enter your username" autocomplete="username"></div>
-      <div class="auth-field"><label>Password</label><input id="login-pass" type="password" placeholder="Enter your password" autocomplete="current-password"></div>
-      <button class="auth-btn" onclick="doLogin()">Sign In</button>
+      <div class="auth-field"><label data-i18n="auth.username">Username</label><input id="login-user" data-i18n="auth.username.ph" placeholder="Enter your username" autocomplete="username"></div>
+      <div class="auth-field"><label data-i18n="auth.password">Password</label><input id="login-pass" type="password" data-i18n="auth.password.ph" placeholder="Enter your password" autocomplete="current-password"></div>
+      <button class="auth-btn" onclick="doLogin()" data-i18n="auth.signin">Sign In</button>
       <div class="auth-msg" id="login-msg"></div>
-      <div class="auth-note">Default Admin &mdash; Username: <strong>admin</strong> &nbsp; Password: <strong>admin123</strong></div>
     </div>
     <!-- SIGNUP FORM -->
     <div id="signup-form" style="display:none">
-      <div class="auth-field"><label>Full Name</label><input id="signup-name" placeholder="Your full name"></div>
-      <div class="auth-field"><label>Username</label><input id="signup-user" placeholder="Choose a username" autocomplete="username"></div>
-      <div class="auth-field"><label>Password</label><input id="signup-pass" type="password" placeholder="Min 6 characters" autocomplete="new-password"></div>
-      <div class="auth-field"><label>Confirm Password</label><input id="signup-pass2" type="password" placeholder="Confirm your password" autocomplete="new-password"></div>
+      <div class="auth-field"><label data-i18n="auth.name">Full Name</label><input id="signup-name" data-i18n="auth.name.ph" placeholder="Your full name"></div>
+      <div class="auth-field"><label data-i18n="auth.username">Username</label><input id="signup-user" data-i18n="auth.choose.user" placeholder="Choose a username" autocomplete="username"></div>
+      <div class="auth-field"><label data-i18n="auth.password">Password</label><input id="signup-pass" type="password" data-i18n="auth.min6" placeholder="Min 6 characters" autocomplete="new-password"></div>
+      <div class="auth-field"><label data-i18n="auth.confirm">Confirm Password</label><input id="signup-pass2" type="password" data-i18n="auth.confirm.ph" placeholder="Confirm your password" autocomplete="new-password"></div>
       <div class="auth-field">
-        <label>Role</label>
+        <label data-i18n="auth.role">Role</label>
         <select id="signup-role">
-          <option value="staff">Staff</option>
-          <option value="admin">Admin (requires admin code)</option>
+          <option value="staff" data-i18n="auth.role.staff">Staff</option>
+          <option value="admin" data-i18n="auth.role.admin">Admin (requires admin code)</option>
         </select>
       </div>
       <div class="auth-field" id="admin-code-field" style="display:none">
-        <label>Admin Authorization Code</label>
-        <input id="signup-admin-code" type="password" placeholder="Enter the admin secret code">
+        <label data-i18n="auth.admin.code">Admin Authorization Code</label>
+        <input id="signup-admin-code" type="password" data-i18n="auth.admin.code.ph" placeholder="Enter the admin secret code">
       </div>
-      <button class="auth-btn" onclick="doSignup()">Create Account</button>
+      <button class="auth-btn" onclick="doSignup()" data-i18n="auth.signup">Create Account</button>
       <div class="auth-msg" id="signup-msg"></div>
-      <div class="auth-note">Staff accounts can record sales.<br>Admin accounts require authorization code from the owner.</div>
+      <div class="auth-note" data-i18n="auth.signup.note">Staff accounts can record sales.<br>Admin accounts require authorization code from the owner.</div>
     </div>
   </div>
 </div>
@@ -65,42 +64,43 @@
 
 <!-- ==================== TOPBAR ==================== -->
 <div class="topbar">
-  <h1>Araria Distributers</h1>
+  <h1 data-i18n="topbar.title">Araria Distributers</h1>
   <div class="topbar-user">
     <span id="connection-status" style="font-size:10px;margin-right:6px"></span>
+    <button class="lang-toggle" onclick="toggleLang()" id="lang-btn" title="English / हिंदी">EN</button>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="theme-btn">&#9790;</button>
     <span id="topbar-info" style="cursor:pointer" onclick="showTab('profile')"></span>
     <span class="user-badge" id="topbar-role" style="cursor:pointer" onclick="showTab('profile')"></span>
-    <button class="logout-btn" onclick="doLogout()">Logout</button>
+    <button class="logout-btn" onclick="doLogout()" data-i18n="topbar.logout">Logout</button>
   </div>
 </div>
 
 <!-- ==================== TABS (DESKTOP) ==================== -->
 <div class="tabs">
-  <button class="tab active" onclick="showTab('dash',this)" data-tab="dash"><span class="tab-icon">&#127968;</span><span class="tab-label">Dashboard</span></button>
-  <button class="tab" onclick="showTab('inv',this)" data-tab="inv"><span class="tab-icon">&#128230;</span><span class="tab-label">Inventory</span></button>
-  <button class="tab" onclick="showTab('bill',this)" data-tab="bill"><span class="tab-icon">&#128176;</span><span class="tab-label">New Sale</span></button>
-  <button class="tab" onclick="showTab('hist',this)" data-tab="hist"><span class="tab-icon">&#128196;</span><span class="tab-label">History</span></button>
-  <button class="tab" onclick="showTab('report',this)" data-tab="report"><span class="tab-icon">&#128202;</span><span class="tab-label">Reports</span></button>
-  <button class="tab" onclick="showTab('staff',this)" data-tab="staff"><span class="tab-icon">&#128101;</span><span class="tab-label">Staff</span></button>
-  <button class="tab" onclick="showTab('admin',this)" data-tab="admin"><span class="tab-icon">&#9881;</span><span class="tab-label">Admin</span></button>
-  <button class="tab" onclick="showTab('perf',this)" data-tab="perf"><span class="tab-icon">&#127942;</span><span class="tab-label">Perf</span></button>
+  <button class="tab active" onclick="showTab('dash',this)" data-tab="dash"><span class="tab-icon">&#127968;</span><span class="tab-label" data-i18n="tab.dashboard">Dashboard</span></button>
+  <button class="tab" onclick="showTab('inv',this)" data-tab="inv"><span class="tab-icon">&#128230;</span><span class="tab-label" data-i18n="tab.inventory">Inventory</span></button>
+  <button class="tab" onclick="showTab('bill',this)" data-tab="bill"><span class="tab-icon">&#128176;</span><span class="tab-label" data-i18n="tab.newsale">New Sale</span></button>
+  <button class="tab" onclick="showTab('hist',this)" data-tab="hist"><span class="tab-icon">&#128196;</span><span class="tab-label" data-i18n="tab.history">History</span></button>
+  <button class="tab" onclick="showTab('report',this)" data-tab="report"><span class="tab-icon">&#128202;</span><span class="tab-label" data-i18n="tab.reports">Reports</span></button>
+  <button class="tab" onclick="showTab('staff',this)" data-tab="staff"><span class="tab-icon">&#128101;</span><span class="tab-label" data-i18n="tab.staff">Staff</span></button>
+  <button class="tab" onclick="showTab('admin',this)" data-tab="admin"><span class="tab-icon">&#9881;</span><span class="tab-label" data-i18n="tab.admin">Admin</span></button>
+  <button class="tab" onclick="showTab('perf',this)" data-tab="perf"><span class="tab-icon">&#127942;</span><span class="tab-label" data-i18n="tab.perf">Perf</span></button>
 </div>
 
 <!-- ==================== MOBILE BOTTOM NAV ==================== -->
 <div class="mobile-nav" id="mobile-nav">
-  <button class="mnav-btn active" onclick="showTab('dash',this)" data-tab="dash"><span class="mnav-icon">&#127968;</span><span class="mnav-text">Home</span></button>
-  <button class="mnav-btn" onclick="showTab('bill',this)" data-tab="bill"><span class="mnav-icon">&#128176;</span><span class="mnav-text">Sale</span></button>
-  <button class="mnav-btn" onclick="showTab('hist',this)" data-tab="hist"><span class="mnav-icon">&#128196;</span><span class="mnav-text">History</span></button>
-  <button class="mnav-btn" onclick="showTab('staff',this)" data-tab="staff"><span class="mnav-icon">&#128101;</span><span class="mnav-text">Staff</span></button>
-  <button class="mnav-btn mnav-more" onclick="toggleMobileMenu()" data-tab="more"><span class="mnav-icon">&#9776;</span><span class="mnav-text">More</span></button>
+  <button class="mnav-btn active" onclick="showTab('dash',this)" data-tab="dash"><span class="mnav-icon">&#127968;</span><span class="mnav-text" data-i18n="mnav.home">Home</span></button>
+  <button class="mnav-btn" onclick="showTab('bill',this)" data-tab="bill"><span class="mnav-icon">&#128176;</span><span class="mnav-text" data-i18n="mnav.sale">Sale</span></button>
+  <button class="mnav-btn" onclick="showTab('hist',this)" data-tab="hist"><span class="mnav-icon">&#128196;</span><span class="mnav-text" data-i18n="mnav.history">History</span></button>
+  <button class="mnav-btn" onclick="showTab('staff',this)" data-tab="staff"><span class="mnav-icon">&#128101;</span><span class="mnav-text" data-i18n="mnav.staff">Staff</span></button>
+  <button class="mnav-btn mnav-more" onclick="toggleMobileMenu()" data-tab="more"><span class="mnav-icon">&#9776;</span><span class="mnav-text" data-i18n="mnav.more">More</span></button>
 </div>
 <div class="mobile-menu" id="mobile-menu">
-  <button class="mmenu-item" onclick="showTab('inv');closeMobileMenu()">&#128230; Inventory</button>
-  <button class="mmenu-item" onclick="showTab('report');closeMobileMenu()">&#128202; Daily Reports</button>
-  <button class="mmenu-item" onclick="showTab('admin');closeMobileMenu()">&#9881; Admin</button>
-  <button class="mmenu-item" onclick="showTab('perf');closeMobileMenu()">&#127942; Performance</button>
-  <button class="mmenu-item" onclick="showTab('profile');closeMobileMenu()">&#128100; My Profile</button>
+  <button class="mmenu-item" data-tab="inv" onclick="showTab('inv');closeMobileMenu()">&#128230; <span data-i18n="mmenu.inventory">Inventory</span></button>
+  <button class="mmenu-item" data-tab="report" onclick="showTab('report');closeMobileMenu()">&#128202; <span data-i18n="mmenu.reports">Daily Reports</span></button>
+  <button class="mmenu-item" data-tab="admin" onclick="showTab('admin');closeMobileMenu()">&#9881; <span data-i18n="mmenu.admin">Admin</span></button>
+  <button class="mmenu-item" data-tab="perf" onclick="showTab('perf');closeMobileMenu()">&#127942; <span data-i18n="mmenu.perf">Performance</span></button>
+  <button class="mmenu-item" data-tab="profile" onclick="showTab('profile');closeMobileMenu()">&#128100; <span data-i18n="mmenu.profile">My Profile</span></button>
 </div>
 
 <div class="content">
@@ -111,17 +111,17 @@
   <div id="da"></div>
   <div class="dash-2col">
     <div class="card" style="margin:0">
-      <div class="card-title">Revenue &mdash; Last 7 Days</div>
+      <div class="card-title" data-i18n="dash.revenue7">Revenue &mdash; Last 7 Days</div>
       <div class="mini-bar-wrap" id="rev-bars"></div>
       <div style="display:flex;gap:5px;margin-top:4px" id="rev-labels"></div>
     </div>
     <div class="card" style="margin:0">
-      <div class="card-title">Category Breakdown</div>
+      <div class="card-title" data-i18n="dash.catbreak">Category Breakdown</div>
       <div id="cat-breakdown"></div>
     </div>
   </div>
   <div class="card" style="margin:0">
-    <div class="card-title">Top 5 Products by Revenue</div>
+    <div class="card-title" data-i18n="dash.top5">Top 5 Products by Revenue</div>
     <div id="top5"></div>
   </div>
 </div>
@@ -129,57 +129,58 @@
 <!-- ==================== INVENTORY ==================== -->
 <div id="tab-inv" class="section">
   <div class="card">
-    <div class="card-title">Add New Product</div>
+    <div class="card-title" data-i18n="inv.addnew">Add New Product</div>
     <div class="r2">
-      <div><label>Product Name *</label><input id="pn" placeholder="e.g. Samsung Galaxy S24"></div>
-      <div><label>SKU / Model No.</label><input id="psku" placeholder="e.g. SGS24-256-BK"></div>
+      <div><label data-i18n="inv.name">Product Name *</label><input id="pn" placeholder="e.g. Samsung Galaxy S24"></div>
+      <div><label data-i18n="inv.sku">SKU / Model No.</label><input id="psku" placeholder="e.g. SGS24-256-BK"></div>
     </div>
     <div class="r4">
-      <div><label>Category</label>
+      <div><label data-i18n="inv.category">Category</label>
         <select id="pcat">
-          <option>Mobile &amp; Tablets</option><option>TV &amp; Display</option><option>Laptops</option>
-          <option>Audio</option><option>Cameras</option><option>Gaming</option>
-          <option>Home Appliances</option><option>Accessories</option><option>Networking</option>
+          <option data-i18n="cat.mobile">Mobile &amp; Tablets</option><option data-i18n="cat.tv">TV &amp; Display</option><option data-i18n="cat.laptops">Laptops</option>
+          <option data-i18n="cat.audio">Audio</option><option data-i18n="cat.cameras">Cameras</option><option data-i18n="cat.gaming">Gaming</option>
+          <option data-i18n="cat.home">Home Appliances</option><option data-i18n="cat.accessories">Accessories</option><option data-i18n="cat.networking">Networking</option>
         </select>
       </div>
-      <div><label>Brand</label><input id="pbrand" placeholder="Samsung, Apple..."></div>
-      <div><label>Selling Price (&#8377;) *</label><input id="psp" type="number" placeholder="0" min="0"></div>
-      <div><label>Cost Price (&#8377;) *</label><input id="pcp" type="number" placeholder="0" min="0"></div>
+      <div><label data-i18n="inv.brand">Brand</label><input id="pbrand" placeholder="Samsung, Apple..."></div>
+      <div><label data-i18n="inv.sellprice">Selling Price (&#8377;) *</label><input id="psp" type="number" placeholder="0" min="0"></div>
+      <div><label data-i18n="inv.costprice">Cost Price (&#8377;) *</label><input id="pcp" type="number" placeholder="0" min="0"></div>
     </div>
     <div class="r4">
-      <div><label>Opening Stock</label><input id="pst" type="number" placeholder="0" min="0"></div>
-      <div><label>Low Stock Alert</label><input id="palt" type="number" value="5" min="0"></div>
-      <div><label>GST %</label>
+      <div><label data-i18n="inv.openstock">Opening Stock</label><input id="pst" type="number" placeholder="0" min="0"></div>
+      <div><label data-i18n="inv.lowstockalert">Low Stock Alert</label><input id="palt" type="number" value="5" min="0"></div>
+      <div><label data-i18n="inv.gstpct">GST %</label>
         <select id="pgst"><option>0</option><option>5</option><option>12</option><option selected>18</option><option>28</option></select>
       </div>
-      <div><label>Warranty (months)</label><input id="pwar" type="number" placeholder="12" min="0"></div>
+      <div><label data-i18n="inv.warranty">Warranty (months)</label><input id="pwar" type="number" placeholder="12" min="0"></div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btp" onclick="addProd()">+ Add Product</button>
-      <button class="btn" onclick="clearPF()">Clear</button>
-      <button class="btn bte" onclick="exportInventory()" style="margin-left:auto">Export Inventory (Excel)</button>
+      <button class="btn btp" onclick="addProd()" data-i18n="inv.addprod">+ Add Product</button>
+      <button class="btn" onclick="clearPF()" data-i18n="inv.clear">Clear</button>
+      <button class="btn bte" onclick="exportInventory()" style="margin-left:auto" data-i18n="inv.export">Export Inventory (Excel)</button>
     </div>
   </div>
   <div class="tbar">
-    <input class="sbar" id="isrch" placeholder="Search name, SKU, brand, category..." oninput="renderInv()" style="flex:1">
+    <input class="sbar" id="isrch" data-i18n="inv.search.ph" placeholder="Search name, SKU, brand, category..." oninput="renderInv()" style="flex:1">
     <select class="sbar" onchange="invCatFilter=this.value;invPage=1;renderInv()" id="icat-sel" style="width:auto">
       <option value="">All Categories</option>
     </select>
     <select class="sbar" onchange="invStockFilter=this.value;invPage=1;renderInv()" style="width:auto">
-      <option value="">All Stock</option><option value="ok">In Stock</option>
-      <option value="low">Low Stock</option><option value="out">Out of Stock</option>
+      <option value="" data-i18n="inv.allstock">All Stock</option><option value="ok" data-i18n="stock.in">In Stock</option>
+      <option value="low" data-i18n="stock.low">Low Stock</option><option value="out" data-i18n="stock.out">Out of Stock</option>
     </select>
   </div>
-  <div style="overflow-x:auto">
+  <div class="inv-table-wrap" style="overflow-x:auto">
     <table>
       <thead><tr>
-        <th style="width:180px">Product</th><th style="width:100px">SKU</th><th>Category</th>
-        <th>Brand</th><th>Sell Price</th><th>Cost</th><th>GST</th><th>Warranty</th>
-        <th style="width:70px">Stock</th><th>Status</th><th style="width:80px">Action</th>
+        <th style="width:180px" data-i18n="inv.product">Product</th><th style="width:100px" data-i18n="inv.th.sku">SKU</th><th data-i18n="inv.category">Category</th>
+        <th data-i18n="inv.brand">Brand</th><th data-i18n="inv.th.sellprice">Sell Price</th><th data-i18n="inv.cost">Cost</th><th data-i18n="inv.gst">GST</th><th data-i18n="inv.th.warranty">Warranty</th>
+        <th style="width:70px" data-i18n="inv.stock">Stock</th><th data-i18n="inv.status">Status</th><th style="width:80px" data-i18n="inv.action">Action</th>
       </tr></thead>
       <tbody id="inv-body"></tbody>
     </table>
   </div>
+  <div class="inv-cards" id="inv-cards"></div>
   <div class="pg" id="inv-pg"></div>
 </div>
 
@@ -188,56 +189,56 @@
   <div class="bill-grid">
     <div>
       <div class="card">
-        <div class="card-title">Add Items to Bill</div>
+        <div class="card-title" data-i18n="bill.additems">Add Items to Bill</div>
         <div class="r2">
           <div>
-            <label>Search &amp; Select Product</label>
-            <input id="bsrch" placeholder="Type product name or SKU..." oninput="filterBillProds()" autocomplete="off">
+            <label data-i18n="bill.searchprod">Search &amp; Select Product</label>
+            <input id="bsrch" data-i18n="bill.searchprod.ph" placeholder="Type product name or SKU..." oninput="filterBillProds()" autocomplete="off">
             <div id="bsugg" class="sugg-box"></div>
           </div>
-          <div><label>Quantity</label><input id="bqty" type="number" value="1" min="1"></div>
+          <div><label data-i18n="bill.qty">Quantity</label><input id="bqty" type="number" value="1" min="1"></div>
         </div>
         <div class="r3">
-          <div><label>Unit Price (&#8377;)</label><input id="bprice" type="number"></div>
-          <div><label>Discount (%)</label><input id="bdisc" type="number" value="0" min="0" max="100" onfocus="this.select()"></div>
-          <div><label>GST (%)</label><input id="bgst" type="number" readonly></div>
+          <div><label data-i18n="bill.unitprice">Unit Price (&#8377;)</label><input id="bprice" type="number"></div>
+          <div><label data-i18n="bill.discount">Discount (%)</label><input id="bdisc" type="number" value="0" min="0" max="100" onfocus="this.select()"></div>
+          <div><label data-i18n="bill.gst">GST (%)</label><input id="bgst" type="number" readonly></div>
         </div>
-        <button class="btn bts" onclick="addBillItem()" style="width:100%">+ Add to Bill</button>
+        <button class="btn bts" onclick="addBillItem()" style="width:100%" data-i18n="bill.addtobill">+ Add to Bill</button>
       </div>
       <div class="card">
-        <div class="card-title">Bill Items</div>
+        <div class="card-title" data-i18n="bill.items">Bill Items</div>
         <div id="bill-list"><p style="color:#94a3b8;padding:8px 0">No items added yet.</p></div>
         <div id="bill-summary" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb"></div>
       </div>
     </div>
     <div>
       <div class="card">
-        <div class="card-title">Customer &amp; Payment</div>
-        <div style="margin-bottom:8px"><label>Customer Name</label><input id="cname" placeholder="Walk-in customer"></div>
-        <div style="margin-bottom:8px"><label>Phone No.</label><input id="cphone" placeholder="+91 98765 43210"></div>
+        <div class="card-title" data-i18n="bill.customer">Customer &amp; Payment</div>
+        <div style="margin-bottom:8px"><label data-i18n="bill.custname">Customer Name</label><input id="cname" data-i18n="bill.custname.ph" placeholder="Walk-in customer"></div>
+        <div style="margin-bottom:8px"><label data-i18n="bill.phone">Phone No.</label><input id="cphone" data-i18n="bill.phone.ph" placeholder="+91 98765 43210"></div>
         <div class="r2" style="margin-bottom:8px">
-          <div><label>Payment Method</label>
+          <div><label data-i18n="bill.payment">Payment Method</label>
             <select id="cpay"><option>Cash</option><option>UPI</option><option>Card</option><option>EMI</option><option>Cheque</option></select>
           </div>
-          <div><label>Invoice No.</label><input id="cinv"></div>
+          <div><label data-i18n="bill.invoice">Invoice No.</label><input id="cinv"></div>
         </div>
         <div class="r2" style="margin-bottom:8px">
-          <div><label>Bill Type</label>
+          <div><label data-i18n="bill.billtype">Bill Type</label>
             <select id="cbilltype" onchange="toggleGstBillNo()">
               <option value="non-gst">Non-GST Bill</option>
               <option value="gst">GST Bill</option>
             </select>
           </div>
-          <div id="gst-billno-wrap" style="display:none"><label>GST Bill No.</label><input id="cgstbill"></div>
+          <div id="gst-billno-wrap" style="display:none"><label data-i18n="bill.gstbillno">GST Bill No.</label><input id="cgstbill"></div>
         </div>
         <div id="sold-by-wrap" style="margin-bottom:8px;display:none">
-          <label>Sold By (override)</label>
+          <label data-i18n="bill.soldby">Sold By (override)</label>
           <select id="csoldby" style="width:100%"><option value="">-- Current User --</option></select>
         </div>
-        <div style="margin-bottom:10px"><label>Notes</label><input id="cnotes" placeholder="Warranty details, special notes..."></div>
-        <button class="btn bts" onclick="completeSale()" style="width:100%;margin-bottom:6px;padding:9px">Complete Sale</button>
-        <button class="btn" onclick="clearBill()" style="width:100%;margin-bottom:6px">Clear Bill</button>
-        <button class="btn bte" onclick="exportLastReceipt()" style="width:100%" id="exp-rcpt" disabled>Export Receipt (Excel)</button>
+        <div style="margin-bottom:10px"><label data-i18n="bill.notes">Notes</label><input id="cnotes" data-i18n="bill.notes.ph" placeholder="Warranty details, special notes..."></div>
+        <button class="btn bts" onclick="completeSale()" style="width:100%;margin-bottom:6px;padding:9px" data-i18n="bill.complete">Complete Sale</button>
+        <button class="btn" onclick="clearBill()" style="width:100%;margin-bottom:6px" data-i18n="bill.clearbill">Clear Bill</button>
+        <button class="btn bte" onclick="exportLastReceipt()" style="width:100%" id="exp-rcpt" disabled data-i18n="bill.exportrcpt">Export Receipt (Excel)</button>
       </div>
       <div id="rcpt-box" style="display:none" class="rcpt"></div>
     </div>
@@ -247,24 +248,24 @@
 <!-- ==================== SALES HISTORY ==================== -->
 <div id="tab-hist" class="section">
   <div class="tbar">
-    <input class="sbar" id="hsrch" placeholder="Search customer, product, invoice..." oninput="histPage=1;renderHist()" style="flex:1">
+    <input class="sbar" id="hsrch" data-i18n="hist.search.ph" placeholder="Search customer, product, invoice..." oninput="histPage=1;renderHist()" style="flex:1">
     <select class="sbar" onchange="histFilter=this.value;histPage=1;renderHist()" style="width:auto">
-      <option value="all">All Time</option><option value="today">Today</option>
-      <option value="week">This Week</option><option value="month">This Month</option>
+      <option value="all" data-i18n="hist.alltime">All Time</option><option value="today" data-i18n="hist.today">Today</option>
+      <option value="week" data-i18n="hist.week">This Week</option><option value="month" data-i18n="hist.month">This Month</option>
     </select>
     <select class="sbar" onchange="histPay=this.value;histPage=1;renderHist()" style="width:auto">
-      <option value="">All Payment</option><option>Cash</option><option>UPI</option><option>Card</option><option>EMI</option>
+      <option value="" data-i18n="hist.allpayment">All Payment</option><option>Cash</option><option>UPI</option><option>Card</option><option>EMI</option>
     </select>
     <select class="sbar" id="hist-staff-sel" onchange="histStaff=this.value;histPage=1;renderHist()" style="width:auto">
       <option value="">All Staff</option>
     </select>
-    <button class="btn bte" onclick="exportSalesXLSX()">Export Sales (Excel)</button>
+    <button class="btn bte" onclick="exportSalesXLSX()" data-i18n="hist.export">Export Sales (Excel)</button>
   </div>
   <div class="hist-table-wrap" style="overflow-x:auto">
     <table>
       <thead><tr>
-        <th>Invoice</th><th>GST Bill</th><th>Date &amp; Time</th><th>Customer</th><th>Phone</th><th style="width:200px">Items</th>
-        <th>Payment</th><th>Subtotal</th><th>GST</th><th>Total</th><th>Profit</th><th>Sold By</th><th>Action</th>
+        <th data-i18n="hist.invoice">Invoice</th><th data-i18n="hist.gstbill">GST Bill</th><th data-i18n="hist.datetime">Date &amp; Time</th><th data-i18n="hist.customer">Customer</th><th data-i18n="hist.phone">Phone</th><th style="width:200px" data-i18n="hist.items">Items</th>
+        <th data-i18n="hist.payment">Payment</th><th data-i18n="hist.subtotal">Subtotal</th><th data-i18n="hist.gst">GST</th><th data-i18n="hist.total">Total</th><th data-i18n="hist.profit">Profit</th><th data-i18n="hist.soldby">Sold By</th><th data-i18n="hist.actions">Action</th>
       </tr></thead>
       <tbody id="hist-body"></tbody>
     </table>
@@ -276,12 +277,12 @@
 <!-- ==================== DAILY REPORTS ==================== -->
 <div id="tab-report" class="section">
   <div class="card">
-    <div class="card-title">Daily Sales Report</div>
+    <div class="card-title" data-i18n="rep.title">Daily Sales Report</div>
     <div class="tbar" style="margin:0">
       <input type="date" id="rep-date" style="font-size:12px;padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;color:#1a1a2e">
-      <button class="btn btp" onclick="renderReport()">View Report</button>
-      <button class="btn bte" onclick="exportDayXLSX()">Export Day (Excel)</button>
-      <button class="btn bto" onclick="exportMonthXLSX()">Export Month (Excel)</button>
+      <button class="btn btp" onclick="renderReport()" data-i18n="rep.view">View Report</button>
+      <button class="btn bte" onclick="exportDayXLSX()" data-i18n="rep.exportday">Export Day (Excel)</button>
+      <button class="btn bto" onclick="exportMonthXLSX()" data-i18n="rep.exportmonth">Export Month (Excel)</button>
     </div>
   </div>
   <div class="metric-grid rep-metrics" id="rep-metrics"></div>
@@ -293,44 +294,44 @@
   <div class="tw">
     <div>
       <div class="card">
-        <div class="card-title">&#128197; Mark Attendance &mdash; <span id="att-date-label"></span></div>
+        <div class="card-title" data-i18n="staff.markatt">&#128197; Mark Attendance &mdash;</div> <span id="att-date-label"></span>
         <div class="tbar" style="margin-bottom:10px">
           <input type="date" id="att-date" style="font-size:12px;padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;color:#1a1a2e" onchange="renderAttendance()">
-          <button class="btn btp" onclick="renderAttendance()">Load</button>
-          <button class="btn bts" onclick="saveAttendance()">Save Attendance</button>
-          <button class="btn bte" onclick="exportAttendanceXLSX()" style="margin-left:auto">Export (Excel)</button>
+          <button class="btn btp" onclick="renderAttendance()" data-i18n="staff.load">Load</button>
+          <button class="btn bts" onclick="saveAttendance()" data-i18n="staff.saveatt">Save Attendance</button>
+          <button class="btn bte" onclick="exportAttendanceXLSX()" style="margin-left:auto" data-i18n="staff.export">Export (Excel)</button>
         </div>
         <div id="att-list"></div>
         <div id="att-msg" class="auth-msg" style="margin-top:8px"></div>
       </div>
       <div class="card" style="margin:0">
-        <div class="card-title">&#128200; Attendance Summary (This Month)</div>
+        <div class="card-title" data-i18n="staff.attsummary">&#128200; Attendance Summary (This Month)</div>
         <div id="att-summary" style="max-height:300px;overflow-y:auto"></div>
       </div>
     </div>
     <div>
       <div class="card">
-        <div class="card-title">&#128101; Manage Staff</div>
+        <div class="card-title" data-i18n="staff.manage">&#128101; Manage Staff</div>
         <div id="staff-list" style="max-height:320px;overflow-y:auto;margin-bottom:10px"></div>
         <div style="border-top:1px solid #e5e7eb;padding-top:10px">
-          <div class="card-title" style="font-size:12px">Add New Staff</div>
+          <div class="card-title" style="font-size:12px" data-i18n="staff.addnew">Add New Staff</div>
           <div class="r2">
-            <div><label>Full Name *</label><input id="new-staff-name" placeholder="Staff full name"></div>
-            <div><label>Username *</label><input id="new-staff-user" placeholder="Lowercase, no spaces"></div>
+            <div><label data-i18n="staff.fullname">Full Name *</label><input id="new-staff-name" placeholder="Staff full name"></div>
+            <div><label data-i18n="staff.username">Username *</label><input id="new-staff-user" placeholder="Lowercase, no spaces"></div>
           </div>
           <div class="r2">
-            <div><label>Password *</label><input id="new-staff-pass" type="password" placeholder="Min 6 characters"></div>
-            <div><label>Phone</label><input id="new-staff-phone" placeholder="+91 ..."></div>
+            <div><label data-i18n="staff.password">Password *</label><input id="new-staff-pass" type="password" placeholder="Min 6 characters"></div>
+            <div><label data-i18n="staff.phone">Phone</label><input id="new-staff-phone" placeholder="+91 ..."></div>
           </div>
-          <button class="btn bts" onclick="addStaff()" style="width:100%">+ Add Staff Member</button>
+          <button class="btn bts" onclick="addStaff()" style="width:100%" data-i18n="staff.addstaff">+ Add Staff Member</button>
           <div id="staff-msg" class="auth-msg" style="margin-top:8px"></div>
         </div>
       </div>
       <div class="card" style="margin:0">
-        <div class="card-title">&#128197; Attendance History</div>
+        <div class="card-title" data-i18n="staff.atthistory">&#128197; Attendance History</div>
         <div class="tbar" style="margin:0">
           <select id="att-hist-month" class="sbar" style="width:auto" onchange="renderAttHistory()"></select>
-          <button class="btn bte" onclick="exportMonthAttXLSX()">Export Month</button>
+          <button class="btn bte" onclick="exportMonthAttXLSX()" data-i18n="staff.exportmonth">Export Month</button>
         </div>
         <div id="att-history" style="max-height:250px;overflow-y:auto;margin-top:8px"></div>
       </div>
@@ -343,60 +344,60 @@
   <div class="tw">
     <div>
       <div class="card">
-        <div class="card-title">&#9998; Manual Stock Adjustment</div>
+        <div class="card-title" data-i18n="admin.stockadj">&#9998; Manual Stock Adjustment</div>
         <div style="margin-bottom:8px">
-          <label>Search Product</label>
-          <input id="adj-srch" placeholder="Type product name or SKU..." oninput="filterAdjProds()">
+          <label data-i18n="admin.searchprod">Search Product</label>
+          <input id="adj-srch" data-i18n="admin.searchprod.ph" placeholder="Type product name or SKU..." oninput="filterAdjProds()">
           <div id="adj-sugg" class="sugg-box"></div>
         </div>
         <div id="adj-selected" style="display:none">
           <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;padding:8px 10px;margin-bottom:8px;font-weight:600;font-size:12px;color:#0369a1" id="adj-name"></div>
           <div class="r3" style="margin-bottom:8px">
-            <div><label>Current Stock</label><input id="adj-cur" readonly></div>
-            <div><label>Adjustment Type</label>
+            <div><label data-i18n="admin.curstock">Current Stock</label><input id="adj-cur" readonly></div>
+            <div><label data-i18n="admin.adjtype">Adjustment Type</label>
               <select id="adj-type">
-                <option value="add">Add Stock (+)</option>
-                <option value="sub">Remove Stock (-)</option>
-                <option value="set">Set Exact Qty</option>
+                <option value="add" data-i18n="admin.addstock">Add Stock (+)</option>
+                <option value="sub" data-i18n="admin.removestock">Remove Stock (-)</option>
+                <option value="set" data-i18n="admin.setexact">Set Exact Qty</option>
               </select>
             </div>
-            <div><label>Quantity</label><input id="adj-qty" type="number" min="1" value="1"></div>
+            <div><label data-i18n="admin.quantity">Quantity</label><input id="adj-qty" type="number" min="1" value="1"></div>
           </div>
-          <div style="margin-bottom:8px"><label>Reason / Note</label><input id="adj-note" placeholder="e.g. New stock arrived, damaged goods removed..."></div>
-          <button class="btn bts" onclick="applyAdj()">Apply Adjustment</button>
+          <div style="margin-bottom:8px"><label data-i18n="admin.reason">Reason / Note</label><input id="adj-note" data-i18n="admin.reason.ph" placeholder="e.g. New stock arrived, damaged goods removed..."></div>
+          <button class="btn bts" onclick="applyAdj()" data-i18n="admin.apply">Apply Adjustment</button>
         </div>
       </div>
       <div class="card" style="margin:0">
-        <div class="card-title">Stock Adjustment Log</div>
+        <div class="card-title" data-i18n="admin.adjlog">Stock Adjustment Log</div>
         <div id="adj-log" style="max-height:240px;overflow-y:auto"></div>
       </div>
     </div>
     <div>
       <div class="card">
-        <div class="card-title">&#8681; Export Data</div>
+        <div class="card-title" data-i18n="admin.exportdata">&#8681; Export Data</div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px">Full Inventory</div><div style="font-size:11px;color:#64748b">All products, prices, stock levels</div></div>
-          <button class="btn bte" onclick="exportInventory()">Excel</button>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.fullinv">Full Inventory</div><div style="font-size:11px;color:#64748b" data-i18n="admin.fullinv.desc">All products, prices, stock levels</div></div>
+          <button class="btn bte" onclick="exportInventory()" data-i18n="admin.excel">Excel</button>
         </div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px">All Sales</div><div style="font-size:11px;color:#64748b">Complete transaction history</div></div>
-          <button class="btn bte" onclick="exportSalesXLSX()">Excel</button>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.allsales">All Sales</div><div style="font-size:11px;color:#64748b" data-i18n="admin.allsales.desc">Complete transaction history</div></div>
+          <button class="btn bte" onclick="exportSalesXLSX()" data-i18n="admin.excel">Excel</button>
         </div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px">Low Stock Report</div><div style="font-size:11px;color:#64748b">Products needing reorder</div></div>
-          <button class="btn bto" onclick="exportLowStock()">Excel</button>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.lowstock">Low Stock Report</div><div style="font-size:11px;color:#64748b" data-i18n="admin.lowstock.desc">Products needing reorder</div></div>
+          <button class="btn bto" onclick="exportLowStock()" data-i18n="admin.excel">Excel</button>
         </div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px">Profit Report</div><div style="font-size:11px;color:#64748b">Revenue, cost &amp; profit per product</div></div>
-          <button class="btn bts" onclick="exportProfit()">Excel</button>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.profitrep">Profit Report</div><div style="font-size:11px;color:#64748b" data-i18n="admin.profitrep.desc">Revenue, cost &amp; profit per product</div></div>
+          <button class="btn bts" onclick="exportProfit()" data-i18n="admin.excel">Excel</button>
         </div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px">Adjustment Log</div><div style="font-size:11px;color:#64748b">All manual stock changes</div></div>
-          <button class="btn" onclick="exportAdjLog()">Excel</button>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.adjlogrep">Adjustment Log</div><div style="font-size:11px;color:#64748b" data-i18n="admin.adjlogrep.desc">All manual stock changes</div></div>
+          <button class="btn" onclick="exportAdjLog()" data-i18n="admin.excel">Excel</button>
         </div>
       </div>
       <div class="card" style="margin:0">
-        <div class="card-title">&#9888; Low Stock Alerts</div>
+        <div class="card-title" data-i18n="admin.lowstockalerts">&#9888; Low Stock Alerts</div>
         <div id="low-stock-list" style="max-height:240px;overflow-y:auto"></div>
       </div>
     </div>
@@ -406,15 +407,15 @@
 <!-- ==================== STAFF SALES PERFORMANCE ==================== -->
 <div id="tab-perf" class="section">
   <div class="card">
-    <div class="card-title">&#127942; Staff Sales Performance</div>
+    <div class="card-title" data-i18n="perf.title">&#127942; Staff Sales Performance</div>
     <div class="tbar" style="margin:0">
       <select class="sbar" onchange="perfPeriod=this.value;renderStaffPerf()" style="width:auto">
-        <option value="all">All Time</option>
-        <option value="today">Today</option>
-        <option value="week">This Week</option>
-        <option value="month">This Month</option>
+        <option value="all" data-i18n="perf.alltime">All Time</option>
+        <option value="today" data-i18n="perf.today">Today</option>
+        <option value="week" data-i18n="perf.week">This Week</option>
+        <option value="month" data-i18n="perf.month">This Month</option>
       </select>
-      <button class="btn bte" onclick="exportStaffPerfXLSX()">Export (Excel)</button>
+      <button class="btn bte" onclick="exportStaffPerfXLSX()" data-i18n="perf.export">Export (Excel)</button>
     </div>
   </div>
   <div id="perf-content"></div>
@@ -433,36 +434,37 @@
 <div id="edit-sale-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)">
   <div style="background:var(--surface,#fff);border-radius:var(--radius-lg,14px);padding:28px 26px;width:520px;max-width:94vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg,0 10px 25px rgba(0,0,0,.15));border:1px solid var(--border,#e2e8f0)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-      <div style="font-size:15px;font-weight:700;color:var(--text,#1e293b)">&#9998; Edit Sale &mdash; <span id="edit-sale-id" style="color:var(--primary,#6366f1)"></span></div>
+      <div style="font-size:15px;font-weight:700;color:var(--text,#1e293b)"><span data-i18n="edit.title">&#9998; Edit Sale &mdash;</span> <span id="edit-sale-id" style="color:var(--primary,#6366f1)"></span></div>
       <button onclick="closeEditSale()" style="border:none;background:none;font-size:22px;cursor:pointer;color:var(--text-muted,#94a3b8);line-height:1">&times;</button>
     </div>
     <div class="r2">
-      <div><label>Customer Name</label><input id="es-customer"></div>
-      <div><label>Phone</label><input id="es-phone"></div>
+      <div><label data-i18n="edit.custname">Customer Name</label><input id="es-customer"></div>
+      <div><label data-i18n="edit.phone">Phone</label><input id="es-phone"></div>
     </div>
     <div class="r3">
-      <div><label>Payment Method</label>
+      <div><label data-i18n="edit.payment">Payment Method</label>
         <select id="es-payment"><option>Cash</option><option>UPI</option><option>Card</option><option>EMI</option><option>Cheque</option></select>
       </div>
-      <div><label>Bill Type</label>
+      <div><label data-i18n="edit.billtype">Bill Type</label>
         <select id="es-billtype"><option value="non-gst">Non-GST</option><option value="gst">GST</option></select>
       </div>
-      <div><label>GST Bill No.</label><input id="es-gstbill"></div>
+      <div><label data-i18n="edit.gstbillno">GST Bill No.</label><input id="es-gstbill"></div>
     </div>
     <div class="r2">
-      <div><label>Sold By</label><select id="es-soldby" style="width:100%"></select></div>
-      <div><label>Invoice No.</label><input id="es-invno"></div>
+      <div><label data-i18n="edit.soldby">Sold By</label><select id="es-soldby" style="width:100%"></select></div>
+      <div><label data-i18n="edit.invoiceno">Invoice No.</label><input id="es-invno"></div>
     </div>
-    <div style="margin-bottom:12px"><label>Notes</label><input id="es-notes"></div>
+    <div style="margin-bottom:12px"><label data-i18n="edit.notes">Notes</label><input id="es-notes"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
-      <button class="btn" onclick="closeEditSale()">Cancel</button>
-      <button class="btn bts" onclick="saveEditSale()">Save Changes</button>
+      <button class="btn" onclick="closeEditSale()" data-i18n="edit.cancel">Cancel</button>
+      <button class="btn bts" onclick="saveEditSale()" data-i18n="edit.save">Save Changes</button>
     </div>
   </div>
 </div>
 
 <!-- ==================== SCRIPTS ==================== -->
 
+<script src="js/lang.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/app.js"></script>

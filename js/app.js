@@ -97,15 +97,15 @@ window.addEventListener('popstate',function(e){
 
 // ==================== INVENTORY ====================
 function stockBadge(p){
-  if(p.stock===0)return '<span class="badge bout"><span class="status-dot dot-r"></span>Out of stock</span>';
-  if(p.stock<=p.alert)return '<span class="badge blow"><span class="status-dot dot-y"></span>Low stock</span>';
-  return '<span class="badge bok"><span class="status-dot dot-g"></span>In stock</span>';
+  if(p.stock===0)return '<span class="badge bout"><span class="status-dot dot-r"></span>'+t('stock.out')+'</span>';
+  if(p.stock<=p.alert)return '<span class="badge blow"><span class="status-dot dot-y"></span>'+t('stock.low')+'</span>';
+  return '<span class="badge bok"><span class="status-dot dot-g"></span>'+t('stock.in')+'</span>';
 }
 
 function populateCatFilter(){
   const sel=D('icat-sel');
   const cats=[...new Set(prods.map(p=>p.cat))].sort();
-  sel.innerHTML='<option value="">All Categories</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  sel.innerHTML='<option value="">'+t('inv.allcat')+'</option>'+cats.map(c=>`<option value="${c}">${tCat(c)}</option>`).join('');
 }
 
 function renderInv(){
@@ -123,17 +123,35 @@ function renderInv(){
   const slice=rows.slice((invPage-1)*invPageSz,invPage*invPageSz);
   D('inv-body').innerHTML=slice.map(p=>`<tr>
     <td style="max-width:180px" title="${p.name}"><strong>${p.name}</strong></td>
-    <td style="color:#64748b">${p.sku||'—'}</td>
-    <td>${p.cat}</td><td>${p.brand||'—'}</td>
+    <td style="color:var(--text-muted)">${p.sku||'—'}</td>
+    <td>${tCat(p.cat)}</td><td>${p.brand||'—'}</td>
     <td style="font-weight:600">${fmt(p.sp)}</td>
-    <td style="color:#64748b">${fmt(p.cp)}</td>
+    <td style="color:var(--text-muted)">${fmt(p.cp)}</td>
     <td>${p.gst}%</td>
     <td>${p.war?p.war+'m':'—'}</td>
     <td><input type="number" value="${p.stock}" min="0" style="width:56px;padding:4px 6px;font-size:11px;text-align:center" onchange="inlineStock(${p.id},this.value)"></td>
     <td>${stockBadge(p)}</td>
-    <td><button class="btn btd" onclick="delProd(${p.id})" style="padding:3px 8px;font-size:11px">Remove</button></td>
+    <td><button class="btn btd" onclick="delProd(${p.id})" style="padding:3px 8px;font-size:11px">${t('common.remove')}</button></td>
   </tr>`).join('');
-  D('inv-pg').innerHTML=`<button class="btn" onclick="invPage=Math.max(1,invPage-1);renderInv()" ${invPage<=1?'disabled':''}>&#8592; Prev</button><span>Page ${invPage} / ${pages} &nbsp;&bull;&nbsp; ${total} products</span><button class="btn" onclick="invPage=Math.min(${pages},invPage+1);renderInv()" ${invPage>=pages?'disabled':''}>Next &#8594;</button>`;
+  // Mobile inventory cards
+  D('inv-cards').innerHTML=slice.length?slice.map(p=>`<div class="inv-card">
+    <div class="ic-head">
+      <div class="ic-name">${p.name}</div>
+      ${stockBadge(p)}
+    </div>
+    <div class="ic-meta">${tCat(p.cat)}${p.brand?' \u2022 '+p.brand:''} ${p.sku&&p.sku!=='—'?' \u2022 '+p.sku:''}</div>
+    <div class="ic-prices">
+      <div><span class="sc-lbl">${t('inv.sell')}</span><span class="sc-val">${fmt(p.sp)}</span></div>
+      <div><span class="sc-lbl">${t('inv.cost')}</span><span class="sc-val" style="color:var(--text-muted)">${fmt(p.cp)}</span></div>
+      <div><span class="sc-lbl">${t('inv.stock')}</span><span class="sc-val${p.stock===0?' sc-danger':p.stock<=p.alert?' sc-warn':''}">${p.stock}</span></div>
+      <div><span class="sc-lbl">${t('inv.gst')}</span><span class="sc-val">${p.gst}%</span></div>
+    </div>
+    <div class="ic-actions">
+      <div style="display:flex;align-items:center;gap:6px;flex:1"><label style="font-size:10px;margin:0">${t('inv.stock')}:</label><input type="number" value="${p.stock}" min="0" style="width:60px;padding:6px;font-size:16px;text-align:center" onchange="inlineStock(${p.id},this.value)"></div>
+      <button class="btn btd" onclick="delProd(${p.id})">${t('common.remove')}</button>
+    </div>
+  </div>`).join(''):'<div style="text-align:center;color:var(--text-muted);padding:32px">'+t('inv.noproducts')+'</div>';
+  D('inv-pg').innerHTML=`<button class="btn" onclick="invPage=Math.max(1,invPage-1);renderInv()" ${invPage<=1?'disabled':''}>&#8592; ${t('common.prev')}</button><span>${t('common.page')} ${invPage} / ${pages} &nbsp;&bull;&nbsp; ${total} ${t('common.products')}</span><button class="btn" onclick="invPage=Math.min(${pages},invPage+1);renderInv()" ${invPage>=pages?'disabled':''}>  ${t('common.next')} &#8594;</button>`;
 }
 
 function addProd(){
@@ -181,7 +199,7 @@ function filterBillProds(){
   sugg.style.display='block';
   sugg.innerHTML=res.map(p=>`<div class="sugg-item" onmousedown="selectBillProd(${p.id})">
     <span><strong>${p.name}</strong> <span style="color:#64748b;font-size:11px">${p.sku}</span></span>
-    <span style="color:#16a34a;font-weight:600">${fmt(p.sp)} &nbsp;<span style="color:#64748b;font-weight:400">Stock: ${p.stock}</span></span>
+    <span style="color:#16a34a;font-weight:600">${fmt(p.sp)} &nbsp;<span style="color:#64748b;font-weight:400">${t('inv.stock')}: ${p.stock}</span></span>
   </div>`).join('');
 }
 function selectBillProd(id){
@@ -212,7 +230,7 @@ function addBillItem(){
 function removeBillItem(idx){billItems.splice(idx,1);renderBill();}
 function renderBill(){
   const el=D('bill-list'),sumEl=D('bill-summary');
-  if(!billItems.length){el.innerHTML='<p style="color:#94a3b8;padding:8px 0">No items added yet.</p>';sumEl.style.display='none';return;}
+  if(!billItems.length){el.innerHTML='<p style="color:#94a3b8;padding:8px 0">'+t('bill.noitems')+'</p>';sumEl.style.display='none';return;}
   el.innerHTML=billItems.map((it,i)=>`<div class="bill-row">
     <span title="${it.name}" style="overflow:hidden;text-overflow:ellipsis"><strong>${it.name}</strong>${it.disc>0?` <span style="color:#d97706;font-size:10px">-${it.disc}%</span>`:''}
       <br><span style="font-size:10px;color:#64748b">${fmt(it.price)}/unit &bull; GST: ${it.gst}%</span></span>
@@ -227,10 +245,10 @@ function renderBill(){
   const profit=billItems.reduce((s,i)=>s+itemProfit(i),0);
   sumEl.style.display='block';
   sumEl.innerHTML=`
-    <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:3px"><span>Subtotal (before GST)</span><span>${fmt(sub)}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:3px"><span>GST Amount</span><span>${fmt(gstAmt)}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;margin-top:6px;padding-top:8px;border-top:2px solid #e5e7eb"><span>Grand Total</span><span style="color:#1a1a2e">${fmt(total)}</span></div>
-    <div style="font-size:11px;color:#16a34a;text-align:right;margin-top:3px">Est. Profit: ${fmt(profit)}</div>`;
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:3px"><span>${t('bill.subtotal')}</span><span>${fmt(sub)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:3px"><span>${t('bill.gstamt')}</span><span>${fmt(gstAmt)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;margin-top:6px;padding-top:8px;border-top:2px solid #e5e7eb"><span>${t('bill.grandtotal')}</span><span style="color:#1a1a2e">${fmt(total)}</span></div>
+    <div style="font-size:11px;color:#16a34a;text-align:right;margin-top:3px">${t('bill.estprofit')}: ${fmt(profit)}</div>`;
 }
 
 function completeSale(){
@@ -260,20 +278,20 @@ function completeSale(){
   sales.unshift(sale);lastSale=sale;
   D('rcpt-box').style.display='block';
   D('rcpt-box').innerHTML=`
-    <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:10px;color:#1a1a2e">&#9889; ElectroShop &mdash; Receipt</div>
-    <div class="rl"><span style="color:#64748b">Invoice</span><span style="font-weight:600;color:#2563eb">${sale.id}</span></div>
-    ${sale.gstBillNo?`<div class="rl"><span style="color:#64748b">GST Bill No.</span><span style="font-weight:600;color:#7c3aed">${sale.gstBillNo}</span></div>`:''}
-    <div class="rl"><span style="color:#64748b">Bill Type</span><span>${sale.billType==='gst'?'<span style="color:#7c3aed;font-weight:600">GST Bill</span>':'Non-GST Bill'}</span></div>
-    <div class="rl"><span style="color:#64748b">Customer</span><span>${cname}</span></div>
-    ${sale.phone?`<div class="rl"><span style="color:#64748b">Phone</span><span>${sale.phone}</span></div>`:''}
-    <div class="rl"><span style="color:#64748b">Date</span><span>${fmtDT(sale.date)}</span></div>
-    <div class="rl"><span style="color:#64748b">Payment</span><span>${sale.payment}</span></div>
-    <div class="rl"><span style="color:#64748b">Sold By</span><span>${sale.soldBy?sale.soldBy.name:'—'}</span></div>
+    <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:10px;color:#1a1a2e">&#9889; ElectroShop &mdash; ${t('bill.receipt')}</div>
+    <div class="rl"><span style="color:#64748b">${t('bill.rcpt.invoice')}</span><span style="font-weight:600;color:#2563eb">${sale.id}</span></div>
+    ${sale.gstBillNo?`<div class="rl"><span style="color:#64748b">${t('bill.rcpt.gstbillno')}</span><span style="font-weight:600;color:#7c3aed">${sale.gstBillNo}</span></div>`:''}
+    <div class="rl"><span style="color:#64748b">${t('bill.rcpt.billtype')}</span><span>${sale.billType==='gst'?'<span style="color:#7c3aed;font-weight:600">'+t('bill.rcpt.gstbill')+'</span>':t('bill.rcpt.nongst')}</span></div>
+    <div class="rl"><span style="color:#64748b">${t('bill.rcpt.customer')}</span><span>${cname}</span></div>
+    ${sale.phone?`<div class="rl"><span style="color:#64748b">${t('bill.rcpt.phone')}</span><span>${sale.phone}</span></div>`:''}
+    <div class="rl"><span style="color:#64748b">${t('bill.rcpt.date')}</span><span>${fmtDT(sale.date)}</span></div>
+    <div class="rl"><span style="color:#64748b">${t('bill.rcpt.payment')}</span><span>${sale.payment}</span></div>
+    <div class="rl"><span style="color:#64748b">${t('bill.rcpt.soldby')}</span><span>${sale.soldBy?sale.soldBy.name:'—'}</span></div>
     <hr style="border:none;border-top:1px solid #e2e8f0;margin:8px 0">
     ${items.map(i=>`<div class="rl"><span>${i.name} x${i.qty}${i.disc>0?' (-'+i.disc+'%)':''}</span><span>${fmt(itemTotal(i))}</span></div>`).join('')}
-    <div class="rl" style="color:#64748b"><span>GST Total</span><span>${fmt(gstAmt)}</span></div>
-    <div class="rl tot"><span>GRAND TOTAL</span><span style="color:#16a34a">${fmt(total)}</span></div>
-    ${sale.notes?`<div style="margin-top:6px;font-size:11px;color:#64748b;background:#f8fafc;padding:6px 8px;border-radius:4px">Note: ${sale.notes}</div>`:''}`;
+    <div class="rl" style="color:#64748b"><span>${t('bill.gsttotal')}</span><span>${fmt(gstAmt)}</span></div>
+    <div class="rl tot"><span>${t('bill.grandtotal.rcpt')}</span><span style="color:#16a34a">${fmt(total)}</span></div>
+    ${sale.notes?`<div style="margin-top:6px;font-size:11px;color:#64748b;background:#f8fafc;padding:6px 8px;border-radius:4px">${t('bill.note')}: ${sale.notes}</div>`:''}`;
   D('exp-rcpt').disabled=false;
   billItems=[];renderBill();
   ['cname','cphone','cnotes'].forEach(i=>D(i).value='');
@@ -305,7 +323,7 @@ function renderHist(){
   const staffSel=D('hist-staff-sel');
   if(staffSel){
     const prev=staffSel.value;
-    staffSel.innerHTML='<option value="">All Staff</option>'+Object.entries(staffNames).map(([u,n])=>`<option value="${u}">${n}</option>`).join('');
+    staffSel.innerHTML='<option value="">'+t('hist.allstaff')+'</option>'+Object.entries(staffNames).map(([u,n])=>`<option value="${u}">${n}</option>`).join('');
     staffSel.value=prev||'';
   }
   const pages=Math.ceil(rows.length/histPageSz)||1;
@@ -326,7 +344,7 @@ function renderHist(){
     <td style="font-size:11px;min-width:100px">${s.soldBy?s.soldBy.name:'<span style="color:#94a3b8">—</span>'}</td>
     <td style="white-space:nowrap">${currentUser&&currentUser.role==='admin'?`<button class="btn btp" onclick="openEditSale('${s.id}')" style="padding:2px 8px;font-size:10px" title="Edit sale">&#9998;</button> <button class="btn btd" onclick="deleteSale('${s.id}')" style="padding:2px 8px;font-size:10px" title="Delete sale &amp; restore stock">&#128465;</button>`:''}</td>
   </tr>`).join('');
-  if(!slice.length)D('hist-body').innerHTML='<tr><td colspan="13" style="text-align:center;color:#94a3b8;padding:24px">No sales found.</td></tr>';
+  if(!slice.length)D('hist-body').innerHTML='<tr><td colspan="13" style="text-align:center;color:#94a3b8;padding:24px">'+t('hist.nosales')+'</td></tr>';
   // Mobile card view
   D('hist-cards').innerHTML=slice.length?slice.map(s=>`<div class="sale-card">
     <div class="sc-head">
@@ -336,17 +354,17 @@ function renderHist(){
     <div class="sc-customer">${s.customer}${s.phone?' &bull; '+s.phone:''}</div>
     <div class="sc-items">${s.items.map(i=>'<span class="sc-chip">'+i.name+(i.qty>1?' x'+i.qty:'')+'</span>').join('')}</div>
     <div class="sc-nums">
-      <div><span class="sc-lbl">Total</span><span class="sc-val">${fmt(s.total)}</span></div>
-      <div><span class="sc-lbl">Profit</span><span class="sc-val sc-profit">${fmt(s.profit)}</span></div>
-      ${s.gstAmt?'<div><span class="sc-lbl">GST</span><span class="sc-val">'+fmt(s.gstAmt)+'</span></div>':''}
+      <div><span class="sc-lbl">${t('hist.total')}</span><span class="sc-val">${fmt(s.total)}</span></div>
+      <div><span class="sc-lbl">${t('hist.profit')}</span><span class="sc-val sc-profit">${fmt(s.profit)}</span></div>
+      ${s.gstAmt?'<div><span class="sc-lbl">'+t('hist.gst')+'</span><span class="sc-val">'+fmt(s.gstAmt)+'</span></div>':''}
     </div>
     <div class="sc-foot">
       <span class="sc-date">${fmtDT(s.date)}</span>
       <span class="sc-sold">${s.soldBy?s.soldBy.name:''}</span>
     </div>
-    ${currentUser&&currentUser.role==='admin'?'<div class="sc-actions"><button class="btn btp" onclick="openEditSale(\''+s.id+'\')" style="flex:1">&#9998; Edit</button><button class="btn btd" onclick="deleteSale(\''+s.id+'\')" style="flex:1">&#128465; Delete</button></div>':''}
-  </div>`).join(''):'<div style="text-align:center;color:#94a3b8;padding:32px">No sales found.</div>';
-  D('hist-pg').innerHTML=`<button class="btn" onclick="histPage=Math.max(1,histPage-1);renderHist()" ${histPage<=1?'disabled':''}>&#8592; Prev</button><span>Page ${histPage}/${pages} &bull; ${rows.length} sales</span><button class="btn" onclick="histPage=Math.min(${pages},histPage+1);renderHist()" ${histPage>=pages?'disabled':''}>Next &#8594;</button>`;
+    ${currentUser&&currentUser.role==='admin'?'<div class="sc-actions"><button class="btn btp" onclick="openEditSale(\''+s.id+'\')" style="flex:1">&#9998; '+t('common.edit')+'</button><button class="btn btd" onclick="deleteSale(\''+s.id+'\')" style="flex:1">&#128465; '+t('common.delete')+'</button></div>':''}
+  </div>`).join(''):'<div style="text-align:center;color:#94a3b8;padding:32px">'+t('hist.nosales')+'</div>';
+  D('hist-pg').innerHTML=`<button class="btn" onclick="histPage=Math.max(1,histPage-1);renderHist()" ${histPage<=1?'disabled':''}>&#8592; ${t('common.prev')}</button><span>${t('common.page')} ${histPage}/${pages} &bull; ${rows.length} ${t('hist.sales')}</span><button class="btn" onclick="histPage=Math.min(${pages},histPage+1);renderHist()" ${histPage>=pages?'disabled':''}>  ${t('common.next')} &#8594;</button>`;
 }
 
 // ==================== EDIT SALE MODAL ====================
@@ -445,20 +463,20 @@ function renderReport(){
   const gst=daySales.reduce((s,x)=>s+x.gstAmt,0);
   const itemsSold=daySales.reduce((s,x)=>s+x.items.reduce((a,i)=>a+i.qty,0),0);
   D('rep-metrics').innerHTML=`
-    <div class="metric"><div class="mlabel">Transactions</div><div class="mval b">${daySales.length}</div></div>
-    <div class="metric"><div class="mlabel">Revenue</div><div class="mval">${fmt(rev)}</div></div>
-    <div class="metric"><div class="mlabel">Profit</div><div class="mval g">${fmt(profit)}</div></div>
-    <div class="metric"><div class="mlabel">GST Collected</div><div class="mval o">${fmt(gst)}</div></div>
-    <div class="metric"><div class="mlabel">Items Sold</div><div class="mval b">${itemsSold}</div></div>`;
-  if(!daySales.length){D('rep-content').innerHTML='<div class="card" style="text-align:center;color:#94a3b8;padding:32px">No sales recorded on this date.</div>';return;}
+    <div class="metric"><div class="mlabel">${t('rep.transactions')}</div><div class="mval b">${daySales.length}</div></div>
+    <div class="metric"><div class="mlabel">${t('rep.revenue')}</div><div class="mval">${fmt(rev)}</div></div>
+    <div class="metric"><div class="mlabel">${t('rep.profit')}</div><div class="mval g">${fmt(profit)}</div></div>
+    <div class="metric"><div class="mlabel">${t('rep.gstcollected')}</div><div class="mval o">${fmt(gst)}</div></div>
+    <div class="metric"><div class="mlabel">${t('rep.itemssold')}</div><div class="mval b">${itemsSold}</div></div>`;
+  if(!daySales.length){D('rep-content').innerHTML='<div class="card" style="text-align:center;color:#94a3b8;padding:32px">'+t('rep.nosales')+'</div>';return;}
   const prodMap={};
   daySales.forEach(s=>s.items.forEach(i=>{if(!prodMap[i.name])prodMap[i.name]={qty:0,rev:0,profit:0};prodMap[i.name].qty+=i.qty;prodMap[i.name].rev+=itemTotal(i);prodMap[i.name].profit+=itemProfit(i);}));
   const sortedProds=Object.entries(prodMap).sort((a,b)=>b[1].rev-a[1].rev);
   const maxRev=sortedProds[0]?sortedProds[0][1].rev:1;
   D('rep-content').innerHTML=`
     <div class="card">
-      <div class="card-title">Transactions on ${dt.toLocaleDateString('en-IN',{dateStyle:'long'})}</div>
-      <table><thead><tr><th>Invoice</th><th>Customer</th><th>Phone</th><th>Items</th><th>Payment</th><th>Subtotal</th><th>GST</th><th>Total</th><th>Profit</th><th>Sold By</th></tr></thead>
+      <div class="card-title">${t('rep.transactionson')} ${dt.toLocaleDateString('en-IN',{dateStyle:'long'})}</div>
+      <table><thead><tr><th>${t('rep.invoice')}</th><th>${t('rep.customer')}</th><th>${t('rep.phone')}</th><th>${t('rep.items')}</th><th>${t('rep.payment')}</th><th>${t('rep.subtotal')}</th><th>${t('rep.gsth')}</th><th>${t('rep.totalh')}</th><th>${t('rep.profith')}</th><th>${t('rep.soldby')}</th></tr></thead>
       <tbody>${daySales.map(s=>`<tr>
         <td style="font-weight:600;color:#2563eb">${s.id}</td>
         <td>${s.customer}</td><td style="color:#64748b">${s.phone||'—'}</td>
@@ -470,11 +488,11 @@ function renderReport(){
       </tr>`).join('')}</tbody></table>
     </div>
     <div class="card" style="margin:0">
-      <div class="card-title">Product Performance</div>
+      <div class="card-title">${t('rep.prodperf')}</div>
       ${sortedProds.map(([name,d])=>`<div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
           <span style="font-weight:600">${name}</span>
-          <span style="color:#64748b">${d.qty} sold &bull; ${fmt(d.rev)} &bull; Profit: <span style="color:#16a34a">${fmt(d.profit)}</span></span>
+          <span style="color:#64748b">${d.qty} ${t('rep.sold')} &bull; ${fmt(d.rev)} &bull; ${t('rep.profith')}: <span style="color:#16a34a">${fmt(d.profit)}</span></span>
         </div>
         <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(d.rev/maxRev*100)}%"></div></div>
       </div>`).join('')}
@@ -490,13 +508,13 @@ function renderDash(){
   const lowCnt=prods.filter(p=>p.stock>0&&p.stock<=p.alert).length;
   const outCnt=prods.filter(p=>p.stock===0).length;
   D('dm').innerHTML=`
-    <div class="metric"><div class="mlabel">Total Revenue</div><div class="mval">${fmt(totalRev)}</div></div>
-    <div class="metric"><div class="mlabel">Total Profit</div><div class="mval g">${fmt(totalProfit)}</div></div>
-    <div class="metric"><div class="mlabel">Today's Revenue</div><div class="mval b">${fmt(todayRev)}</div></div>
-    <div class="metric"><div class="mlabel">Total Products</div><div class="mval">${prods.length}</div></div>`;
+    <div class="metric"><div class="mlabel">${t('dash.totalrev')}</div><div class="mval">${fmt(totalRev)}</div></div>
+    <div class="metric"><div class="mlabel">${t('dash.totalprofit')}</div><div class="mval g">${fmt(totalProfit)}</div></div>
+    <div class="metric"><div class="mlabel">${t('dash.todayrev')}</div><div class="mval b">${fmt(todayRev)}</div></div>
+    <div class="metric"><div class="mlabel">${t('dash.totalprods')}</div><div class="mval">${prods.length}</div></div>`;
   let al='';
-  if(outCnt)al+=`<div class="alert-box">&#9888; <strong>${outCnt} product(s) are out of stock.</strong> <a href="#" onclick="showTab('inv',document.querySelectorAll('.tab')[1]);return false" style="color:#92400e">View Inventory &rarr;</a></div>`;
-  if(lowCnt)al+=`<div class="alert-box">&#128203; <strong>${lowCnt} product(s) are running low on stock.</strong> <a href="#" onclick="showTab('admin',document.querySelectorAll('.tab')[6]);return false" style="color:#92400e">View Alerts &rarr;</a></div>`;
+  if(outCnt)al+=`<div class="alert-box">&#9888; <strong>${outCnt} ${t('dash.outofstock')}</strong> <a href="#" onclick="showTab('inv');return false" style="color:#92400e">${t('dash.viewinv')}</a></div>`;
+  if(lowCnt)al+=`<div class="alert-box">&#128203; <strong>${lowCnt} ${t('dash.lowstock')}</strong> <a href="#" onclick="showTab('admin');return false" style="color:#92400e">${t('dash.viewalerts')}</a></div>`;
   D('da').innerHTML=al;
   const wdays=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const dayVals=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return sales.filter(s=>new Date(s.date).toDateString()===d.toDateString()).reduce((s,x)=>s+x.total,0);});
@@ -508,16 +526,16 @@ function renderDash(){
   const catArr=Object.entries(catRev).sort((a,b)=>b[1]-a[1]);
   const maxCat=catArr[0]?catArr[0][1]:1;
   D('cat-breakdown').innerHTML=catArr.length?catArr.map(([cat,rev])=>`<div style="margin-bottom:8px">
-    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:500">${cat}</span><span style="color:#64748b">${fmt(rev)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:500">${tCat(cat)}</span><span style="color:#64748b">${fmt(rev)}</span></div>
     <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(rev/maxCat*100)}%"></div></div>
-  </div>`).join(''):'<p style="color:#94a3b8;font-size:12px;padding:8px 0">No sales yet. Make your first sale!</p>';
+  </div>`).join(''):'<p style="color:#94a3b8;font-size:12px;padding:8px 0">'+t('dash.nosalesyet')+'</p>';
   const prodS={};
   sales.forEach(s=>s.items.forEach(i=>{if(!prodS[i.name])prodS[i.name]={qty:0,rev:0};prodS[i.name].qty+=i.qty;prodS[i.name].rev+=itemTotal(i);}));
   const top=Object.entries(prodS).sort((a,b)=>b[1].rev-a[1].rev).slice(0,5);
   D('top5').innerHTML=top.length?top.map(([n,d],idx)=>`<div style="display:flex;justify-content:space-between;padding:7px 10px;background:${idx%2?'#f9fafb':'#fff'};border-radius:4px;font-size:12px">
     <span><strong style="color:#2563eb">#${idx+1}</strong> &nbsp;${n}</span>
-    <span style="color:#64748b">${d.qty} sold &mdash; <strong style="color:#1a1a2e">${fmt(d.rev)}</strong></span>
-  </div>`).join(''):'<p style="color:#94a3b8;font-size:12px;padding:8px 0">No sales yet.</p>';
+    <span style="color:#64748b">${d.qty} ${t('common.sold')} &mdash; <strong style="color:#1a1a2e">${fmt(d.rev)}</strong></span>
+  </div>`).join(''):'<p style="color:#94a3b8;font-size:12px;padding:8px 0">'+t('dash.nosales')+'</p>';
 }
 
 // ==================== ADMIN / STOCK ADJUSTMENT ====================
@@ -530,7 +548,7 @@ function filterAdjProds(){
   sugg.style.display='block';
   sugg.innerHTML=res.map(p=>`<div class="sugg-item" onmousedown="selectAdjProd(${p.id})">
     <span>${p.name} <span style="color:#64748b;font-size:11px">${p.sku}</span></span>
-    <span style="color:#64748b">Stock: <strong>${p.stock}</strong></span>
+    <span style="color:#64748b">${t('inv.stock')}: <strong>${p.stock}</strong></span>
   </div>`).join('');
 }
 function selectAdjProd(id){
@@ -565,17 +583,17 @@ function renderAdjLog(){
     </div>
     <div style="font-size:11px;color:#64748b">${fmtDT(l.time)} &bull; ${l.before} &rarr; ${l.after}</div>
     <div style="font-size:11px;color:#94a3b8;font-style:italic">${l.note}</div>
-  </div>`).join(''):'<p style="color:#94a3b8;font-size:12px;padding:8px 0">No adjustments yet.</p>';
+  </div>`).join(''):'<p style="color:#94a3b8;font-size:12px;padding:8px 0">'+t('admin.noadj')+'</p>';
 }
 function renderLowStockList(){
   const list=prods.filter(p=>p.stock<=p.alert).sort((a,b)=>a.stock-b.stock);
   D('low-stock-list').innerHTML=list.length?list.map(p=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1f5f9;align-items:center">
     <div>
       <div style="font-weight:600;font-size:12px">${p.name}</div>
-      <div style="font-size:11px;color:#64748b">${p.sku} &bull; ${p.cat} &bull; ${p.brand}</div>
+      <div style="font-size:11px;color:#64748b">${p.sku} &bull; ${tCat(p.cat)} &bull; ${p.brand}</div>
     </div>
-    <div style="text-align:right">${stockBadge(p)}<div style="font-size:10px;color:#64748b;margin-top:2px">Alert: ${p.alert}</div></div>
-  </div>`).join(''):'<p style="color:#16a34a;font-size:12px;padding:8px 0">&#10003; All products are well stocked!</p>';
+    <div style="text-align:right">${stockBadge(p)}<div style="font-size:10px;color:#64748b;margin-top:2px">${t('admin.alert')}: ${p.alert}</div></div>
+  </div>`).join(''):'<p style="color:#16a34a;font-size:12px;padding:8px 0">&#10003; '+t('admin.allstocked')+'</p>';
 }
 
 // ==================== EXCEL EXPORTS ====================
@@ -909,47 +927,65 @@ function renderStaffPerf(){
   const el=D('perf-content');
 
   if(!arr.length){
-    el.innerHTML='<div class="card" style="text-align:center;color:#94a3b8;padding:32px">No sales data found for this period.</div>';
+    el.innerHTML='<div class="card" style="text-align:center;color:#94a3b8;padding:32px">'+t('perf.nodata')+'</div>';
     return;
   }
 
   el.innerHTML=`
-    <div class="metric-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px">
-      <div class="metric"><div class="mlabel">Total Staff Sellers</div><div class="mval b">${arr.length}</div></div>
-      <div class="metric"><div class="mlabel">Total Transactions</div><div class="mval">${arr.reduce((s,x)=>s+x.count,0)}</div></div>
-      <div class="metric"><div class="mlabel">Total Revenue</div><div class="mval">${fmt(arr.reduce((s,x)=>s+x.revenue,0))}</div></div>
-      <div class="metric"><div class="mlabel">Total Profit</div><div class="mval g">${fmt(arr.reduce((s,x)=>s+x.profit,0))}</div></div>
+    <div class="metric-grid perf-metrics">
+      <div class="metric"><div class="mlabel">${t('perf.totalstaff')}</div><div class="mval b">${arr.length}</div></div>
+      <div class="metric"><div class="mlabel">${t('perf.totaltrans')}</div><div class="mval">${arr.reduce((s,x)=>s+x.count,0)}</div></div>
+      <div class="metric"><div class="mlabel">${t('perf.totalrev')}</div><div class="mval">${fmt(arr.reduce((s,x)=>s+x.revenue,0))}</div></div>
+      <div class="metric"><div class="mlabel">${t('perf.totalprofit')}</div><div class="mval g">${fmt(arr.reduce((s,x)=>s+x.profit,0))}</div></div>
     </div>
     <div class="card">
-      <div class="card-title">&#127942; Staff Ranking by Revenue</div>
+      <div class="card-title">&#127942; ${t('perf.ranking')}</div>
+      <div class="perf-table-wrap">
       <table><thead><tr>
-        <th>Rank</th><th>Staff Name</th><th>Username</th><th>Sales Count</th><th>Items Sold</th><th>Revenue</th><th>Profit</th><th>Performance</th>
+        <th>${t('perf.rank')}</th><th>${t('perf.staffname')}</th><th>${t('perf.username')}</th><th>${t('perf.salescount')}</th><th>${t('perf.itemssold')}</th><th>${t('perf.revenue')}</th><th>${t('perf.profith')}</th><th>${t('perf.performance')}</th>
       </tr></thead>
       <tbody>${arr.map((s,i)=>`<tr>
-        <td style="font-weight:700;color:${i===0?'#d97706':i===1?'#64748b':i===2?'#b45309':'#1a1a2e'};font-size:14px">${i===0?'&#129351;':i===1?'&#129352;':i===2?'&#129353;':'#'+(i+1)}</td>
+        <td style="font-weight:700;color:${i===0?'#d97706':i===1?'#64748b':i===2?'#b45309':'var(--text)'};font-size:14px">${i===0?'&#129351;':i===1?'&#129352;':i===2?'&#129353;':'#'+(i+1)}</td>
         <td style="font-weight:600">${s.name}</td>
-        <td style="color:#64748b">@${s.username}</td>
+        <td style="color:var(--text-muted)">@${s.username}</td>
         <td style="text-align:center">${s.count}</td>
         <td style="text-align:center">${s.items}</td>
         <td style="font-weight:600">${fmt(s.revenue)}</td>
         <td style="color:#16a34a;font-weight:600">${fmt(s.profit)}</td>
         <td style="width:140px"><div class="prog-bar"><div class="prog-fill" style="width:${Math.round(s.revenue/maxRev*100)}%"></div></div></td>
       </tr>`).join('')}</tbody></table>
+      </div>
+      <div class="perf-cards">
+        ${arr.map((s,i)=>`<div class="perf-card">
+          <div class="pc-head">
+            <span class="pc-rank">${i===0?'\u{1f947}':i===1?'\u{1f948}':i===2?'\u{1f949}':'#'+(i+1)}</span>
+            <div class="pc-name">${s.name}<span class="pc-user">@${s.username}</span></div>
+          </div>
+          <div class="pc-stats">
+            <div><span class="sc-lbl">${t('perf.sales')}</span><span class="sc-val">${s.count}</span></div>
+            <div><span class="sc-lbl">${t('perf.revenue')}</span><span class="sc-val">${fmt(s.revenue)}</span></div>
+            <div><span class="sc-lbl">${t('perf.profith')}</span><span class="sc-val sc-profit">${fmt(s.profit)}</span></div>
+            <div><span class="sc-lbl">${t('perf.items')}</span><span class="sc-val">${s.items}</span></div>
+          </div>
+          <div class="prog-bar" style="margin-top:8px"><div class="prog-fill" style="width:${Math.round(s.revenue/maxRev*100)}%"></div></div>
+        </div>`).join('')}
+      </div>
     </div>
     <div class="card" style="margin:0">
-      <div class="card-title">&#128202; Individual Sales Breakdown</div>
+      <div class="card-title">&#128202; ${t('perf.breakdown')}</div>
       ${arr.map(s=>{
         const mySales=sales.filter(x=>x.soldBy&&x.soldBy.username===s.username);
         const recent=mySales.slice(0,5);
-        return `<div style="margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f1f5f9">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="font-weight:700;font-size:13px">${s.name} <span style="color:#94a3b8;font-size:11px;font-weight:400">@${s.username}</span></span>
-            <span style="font-size:11px;color:#64748b">${s.count} sales &bull; ${fmt(s.revenue)} revenue</span>
+        return `<div class="perf-breakdown">
+          <div class="pb-head">
+            <span style="font-weight:700;font-size:13px">${s.name} <span style="color:var(--text-muted);font-size:11px;font-weight:400">@${s.username}</span></span>
+            <span style="font-size:11px;color:var(--text-secondary)">${s.count} ${t('perf.sales')} &bull; ${fmt(s.revenue)}</span>
           </div>
-          <div style="font-size:11px;color:#64748b;margin-bottom:4px">Recent sales:</div>
-          ${recent.map(x=>`<div style="display:flex;justify-content:space-between;padding:3px 8px;font-size:11px;background:#f9fafb;border-radius:3px;margin-bottom:2px">
-            <span><strong style="color:#2563eb">${x.id}</strong> &mdash; ${x.customer} &mdash; ${x.items.map(i=>i.name).join(', ')}</span>
-            <span style="font-weight:600">${fmt(x.total)}</span>
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">${t('perf.recentsales')}:</div>
+          ${recent.map(x=>`<div class="pb-sale">
+            <div><strong style="color:#2563eb">${x.id}</strong> &mdash; ${x.customer}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${x.items.map(i=>i.name).join(', ')}</div>
+            <div style="font-weight:700;font-size:12px;margin-top:2px">${fmt(x.total)}</div>
           </div>`).join('')}
         </div>`;
       }).join('')}
@@ -1016,61 +1052,61 @@ async function renderProfile(){
   const initials=currentUser.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
 
   el.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="profile-grid">
       <div>
         <div class="card">
           <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
             <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:700;flex-shrink:0">${initials}</div>
             <div>
-              <div style="font-size:18px;font-weight:700;color:#1a1a2e">${currentUser.name}</div>
-              <div style="font-size:12px;color:#64748b">@${currentUser.username}</div>
+              <div style="font-size:18px;font-weight:700;color:var(--text)">${currentUser.name}</div>
+              <div style="font-size:12px;color:var(--text-muted)">@${currentUser.username}</div>
               <span class="badge" style="background:${currentUser.role==='admin'?'rgba(245,158,11,.15);color:#d97706':'rgba(59,130,246,.15);color:#2563eb'};font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 10px;border-radius:99px;margin-top:4px;display:inline-block">${currentUser.role}</span>
             </div>
           </div>
-          <div style="border-top:1px solid #e5e7eb;padding-top:10px">
-            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px"><span style="color:#64748b">Full Name</span><span style="font-weight:600">${currentUser.name}</span></div>
-            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px"><span style="color:#64748b">Username</span><span style="font-weight:600">@${currentUser.username}</span></div>
-            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px"><span style="color:#64748b">Role</span><span style="font-weight:600;text-transform:capitalize">${currentUser.role}</span></div>
-            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px"><span style="color:#64748b">Phone</span><span style="font-weight:600">${userData.phone||'\u2014'}</span></div>
-            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px"><span style="color:#64748b">Joined</span><span style="font-weight:600">${joinDate}</span></div>
+          <div style="border-top:1px solid var(--border);padding-top:10px">
+            <div class="prof-row"><span>${t('prof.fullname')}</span><span>${currentUser.name}</span></div>
+            <div class="prof-row"><span>${t('prof.username')}</span><span>@${currentUser.username}</span></div>
+            <div class="prof-row"><span>${t('prof.role')}</span><span style="text-transform:capitalize">${currentUser.role}</span></div>
+            <div class="prof-row"><span>${t('prof.phone')}</span><span>${userData.phone||'\u2014'}</span></div>
+            <div class="prof-row"><span>${t('prof.joined')}</span><span>${joinDate}</span></div>
           </div>
         </div>
         <div class="card" style="margin:0">
-          <div class="card-title">&#128197; Attendance This Month (${monthName})</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
-            <div style="background:#dcfce7;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:700;color:#15803d">${attStats.present}</div><div style="font-size:10px;color:#15803d">Present</div></div>
-            <div style="background:#fee2e2;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:700;color:#b91c1c">${attStats.absent}</div><div style="font-size:10px;color:#b91c1c">Absent</div></div>
-            <div style="background:#fef9c3;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:700;color:#a16207">${attStats.half}</div><div style="font-size:10px;color:#a16207">Half Day</div></div>
-            <div style="background:#eff6ff;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:700;color:#1d4ed8">${attStats.leave}</div><div style="font-size:10px;color:#1d4ed8">Leave</div></div>
+          <div class="card-title">&#128197; ${t('prof.attmonth')} (${monthName})</div>
+          <div class="att-stat-grid">
+            <div style="background:#dcfce7;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:700;color:#15803d">${attStats.present}</div><div style="font-size:10px;color:#15803d">${t('prof.present')}</div></div>
+            <div style="background:#fee2e2;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:700;color:#b91c1c">${attStats.absent}</div><div style="font-size:10px;color:#b91c1c">${t('prof.absent')}</div></div>
+            <div style="background:#fef9c3;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:700;color:#a16207">${attStats.half}</div><div style="font-size:10px;color:#a16207">${t('prof.halfday')}</div></div>
+            <div style="background:#eff6ff;border-radius:8px;padding:10px"><div style="font-size:20px;font-weight:700;color:#1d4ed8">${attStats.leave}</div><div style="font-size:10px;color:#1d4ed8">${t('prof.leave')}</div></div>
           </div>
         </div>
       </div>
       <div>
         <div class="card">
-          <div class="card-title">&#128200; My Sales Overview</div>
-          <div class="metric-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:0">
-            <div class="metric"><div class="mlabel">Total Sales</div><div class="mval b">${mySales.length}</div></div>
-            <div class="metric"><div class="mlabel">Items Sold</div><div class="mval">${myItems}</div></div>
-            <div class="metric"><div class="mlabel">Revenue Generated</div><div class="mval">${fmt(myRev)}</div></div>
-            <div class="metric"><div class="mlabel">Profit Earned</div><div class="mval g">${fmt(myProfit)}</div></div>
-            <div class="metric"><div class="mlabel">Today's Sales</div><div class="mval b">${todaySales.length}</div></div>
-            <div class="metric"><div class="mlabel">Today's Revenue</div><div class="mval">${fmt(todayRev)}</div></div>
+          <div class="card-title">&#128200; ${t('prof.salesoverview')}</div>
+          <div class="metric-grid prof-metrics">
+            <div class="metric"><div class="mlabel">${t('prof.totalsales')}</div><div class="mval b">${mySales.length}</div></div>
+            <div class="metric"><div class="mlabel">${t('prof.itemssold')}</div><div class="mval">${myItems}</div></div>
+            <div class="metric"><div class="mlabel">${t('prof.revgen')}</div><div class="mval">${fmt(myRev)}</div></div>
+            <div class="metric"><div class="mlabel">${t('prof.profitearned')}</div><div class="mval g">${fmt(myProfit)}</div></div>
+            <div class="metric"><div class="mlabel">${t('prof.todaysales')}</div><div class="mval b">${todaySales.length}</div></div>
+            <div class="metric"><div class="mlabel">${t('prof.todayrev')}</div><div class="mval">${fmt(todayRev)}</div></div>
           </div>
         </div>
         <div class="card" style="margin:0">
-          <div class="card-title">&#128221; My Recent Sales</div>
-          <div style="max-height:280px;overflow-y:auto">
-          ${mySales.length?mySales.slice(0,10).map(s=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1f5f9;font-size:12px">
+          <div class="card-title">&#128221; ${t('prof.recentsales')}</div>
+          <div style="max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch">
+          ${mySales.length?mySales.slice(0,10).map(s=>`<div class="prof-sale">
             <div>
               <span style="font-weight:600;color:#2563eb">${s.id}</span>
-              <span style="color:#64748b;margin-left:6px">${fmtDT(s.date)}</span>
-              <div style="font-size:11px;color:#64748b;margin-top:2px">${s.customer} &mdash; ${s.items.map(i=>i.name).join(', ')}</div>
+              <span style="color:var(--text-muted);margin-left:6px;font-size:11px">${fmtDT(s.date)}</span>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${s.customer} &mdash; ${s.items.map(i=>i.name).join(', ')}</div>
             </div>
             <div style="text-align:right;white-space:nowrap">
               <div style="font-weight:700">${fmt(s.total)}</div>
-              <div style="font-size:11px;color:#16a34a">${fmt(s.profit)} profit</div>
+              <div style="font-size:11px;color:#16a34a">${fmt(s.profit)} ${t('prof.profit')}</div>
             </div>
-          </div>`).join(''):'<p style="color:#94a3b8;font-size:12px;padding:8px 0">No sales yet. Complete your first sale!</p>'}
+          </div>`).join(''):'<p style="color:var(--text-muted);font-size:12px;padding:8px 0">'+t('profile.nosales')+'</p>'}
           </div>
         </div>
       </div>
@@ -1095,5 +1131,7 @@ async function appInit() {
   const tab=(hash && tabMap[hash]!=null)?hash:'dash';
   history.replaceState({tab},'',' #'+tab);
   if(session) showTab(tab,null,true);
+  // Restore saved language
+  applyLang(currentLang);
 }
 appInit();
