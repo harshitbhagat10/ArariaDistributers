@@ -25,6 +25,7 @@ const D=id=>document.getElementById(id);
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 const fmtDT=d=>{const x=new Date(d);return x.toLocaleDateString('en-IN')+' '+x.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})};
 const fmtD=d=>new Date(d).toLocaleDateString('en-IN');
+const esc=s=>{if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;};
 
 // ==================== THEME ====================
 function applyTheme(theme){
@@ -233,9 +234,13 @@ function addBillItem(){
   if(qty>selBillProd.stock){alert('Only '+selBillProd.stock+' units in stock!');return;}
   const price=parseFloat(D('bprice').value)||selBillProd.sp;
   const disc=parseFloat(D('bdisc').value)||0;
-  const ex=billItems.find(i=>i.id===selBillProd.id);
+  const ex=billItems.find(i=>i.id===selBillProd.id&&i.price===price&&i.disc===disc);
   if(ex){const newQty=ex.qty+qty;if(newQty>selBillProd.stock){alert('Not enough stock.');return;}ex.qty=newQty;}
-  else billItems.push({id:selBillProd.id,name:selBillProd.name,qty,price,cp:selBillProd.cp,disc,gst:selBillProd.gst});
+  else{
+    const totalQty=billItems.filter(i=>i.id===selBillProd.id).reduce((s,i)=>s+i.qty,0)+qty;
+    if(totalQty>selBillProd.stock){alert('Not enough stock.');return;}
+    billItems.push({id:selBillProd.id,name:selBillProd.name,qty,price,cp:selBillProd.cp,disc,gst:selBillProd.gst});
+  }
   D('bsrch').value='';D('bqty').value=1;D('bdisc').value=0;D('bprice').value='';D('bgst').value='';selBillProd=null;
   renderBill();
 }
@@ -244,7 +249,7 @@ function renderBill(){
   const el=D('bill-list'),sumEl=D('bill-summary');
   if(!billItems.length){el.innerHTML='<p style="color:var(--text-muted);padding:8px 0">'+t('bill.noitems')+'</p>';sumEl.style.display='none';return;}
   el.innerHTML=billItems.map((it,i)=>`<div class="bill-row">
-    <span title="${it.name}" style="overflow:hidden;text-overflow:ellipsis"><strong>${it.name}</strong>${it.disc>0?` <span style="color:var(--warning);font-size:10px">-${it.disc}%</span>`:''}
+    <span title="${esc(it.name)}" style="overflow:hidden;text-overflow:ellipsis"><strong>${esc(it.name)}</strong>${it.disc>0?` <span style="color:var(--warning);font-size:10px">-${it.disc}%</span>`:''}
       <br><span style="font-size:10px;color:var(--text-muted)">${fmt(it.price)}/unit &bull; GST: ${it.gst}%</span></span>
     <span style="text-align:center;color:var(--text-muted)">x${it.qty}</span>
     <span style="font-weight:600">${fmt(itemTotal(it))}</span>
@@ -290,20 +295,20 @@ function completeSale(){
   sales.unshift(sale);lastSale=sale;
   D('rcpt-box').style.display='block';
   D('rcpt-box').innerHTML=`
-    <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">&#9889; ElectroShop &mdash; ${t('bill.receipt')}</div>
+    <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">&#9889; Araria Distributers &mdash; ${t('bill.receipt')}</div>
     <div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.invoice')}</span><span style="font-weight:600;color:var(--primary)">${sale.id}</span></div>
     ${sale.gstBillNo?`<div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.gstbillno')}</span><span style="font-weight:600;color:var(--purple)">${sale.gstBillNo}</span></div>`:''}
     <div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.billtype')}</span><span>${sale.billType==='gst'?'<span style="color:var(--purple);font-weight:600">'+t('bill.rcpt.gstbill')+'</span>':t('bill.rcpt.nongst')}</span></div>
-    <div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.customer')}</span><span>${cname}</span></div>
-    ${sale.phone?`<div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.phone')}</span><span>${sale.phone}</span></div>`:''}
+    <div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.customer')}</span><span>${esc(cname)}</span></div>
+    ${sale.phone?`<div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.phone')}</span><span>${esc(sale.phone)}</span></div>`:''}
     <div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.date')}</span><span>${fmtDT(sale.date)}</span></div>
     <div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.payment')}</span><span>${sale.payment}</span></div>
     <div class="rl"><span style="color:var(--text-muted)">${t('bill.rcpt.soldby')}</span><span>${sale.soldBy?sale.soldBy.name:'—'}</span></div>
-    <hr style="border:none;border-top:1px solid #e2e8f0;margin:8px 0">
-    ${items.map(i=>`<div class="rl"><span>${i.name} x${i.qty}${i.disc>0?' (-'+i.disc+'%)':''}</span><span>${fmt(itemTotal(i))}</span></div>`).join('')}
+    <hr style="border:none;border-top:1px solid var(--border);margin:8px 0">
+    ${items.map(i=>`<div class="rl"><span>${esc(i.name)} x${i.qty}${i.disc>0?' (-'+i.disc+'%)':''}</span><span>${fmt(itemTotal(i))}</span></div>`).join('')}
     <div class="rl" style="color:var(--text-muted)"><span>${t('bill.gsttotal')}</span><span>${fmt(gstAmt)}</span></div>
     <div class="rl tot"><span>${t('bill.grandtotal.rcpt')}</span><span style="color:var(--success)">${fmt(total)}</span></div>
-    ${sale.notes?`<div style="margin-top:6px;font-size:11px;color:var(--text-muted);background:var(--surface-alt);padding:6px 8px;border-radius:6px">${t('bill.note')}: ${sale.notes}</div>`:''}`;
+    ${sale.notes?`<div style="margin-top:6px;font-size:11px;color:var(--text-muted);background:var(--surface-alt);padding:6px 8px;border-radius:6px">${t('bill.note')}: ${esc(sale.notes)}</div>`:''}`;
   D('exp-rcpt').disabled=false;
   billItems=[];renderBill();
   ['cname','cphone','cnotes'].forEach(i=>D(i).value='');
@@ -345,9 +350,9 @@ function renderHist(){
     <td style="font-weight:600;color:var(--primary)">${s.id}</td>
     <td style="font-size:11px">${s.gstBillNo?'<span style="color:var(--purple);font-weight:600">'+s.gstBillNo+'</span>':'<span style="color:var(--text-muted)">—</span>'}</td>
     <td>${fmtDT(s.date)}</td>
-    <td>${s.customer}</td>
-    <td style="color:var(--text-muted)">${s.phone||'—'}</td>
-    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis" title="${s.items.map(i=>i.name+' x'+i.qty).join(', ')}">${s.items.map(i=>i.name+(i.qty>1?' x'+i.qty:'')).join(', ')}</td>
+    <td>${esc(s.customer)}</td>
+    <td style="color:var(--text-muted)">${esc(s.phone)||'—'}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis" title="${esc(s.items.map(i=>i.name+' x'+i.qty).join(', '))}">${s.items.map(i=>esc(i.name)+(i.qty>1?' x'+i.qty:'')).join(', ')}</td>
     <td><span class="badge" style="background:var(--info-bg);color:var(--info)">${s.payment}</span></td>
     <td>${fmt(s.sub)}</td>
     <td style="color:var(--text-muted)">${fmt(s.gstAmt)}</td>
@@ -363,7 +368,7 @@ function renderHist(){
       <div><span class="sc-inv">${s.id}</span>${s.gstBillNo?'<span class="sc-gst">'+s.gstBillNo+'</span>':''}</div>
       <span class="badge" style="background:var(--info-bg);color:var(--info);font-size:10px;padding:3px 8px">${s.payment}</span>
     </div>
-    <div class="sc-customer">${s.customer}${s.phone?' &bull; '+s.phone:''}</div>
+    <div class="sc-customer">${esc(s.customer)}${s.phone?' &bull; '+esc(s.phone):''}</div>
     <div class="sc-items">${s.items.map(i=>'<span class="sc-chip">'+i.name+(i.qty>1?' x'+i.qty:'')+'</span>').join('')}</div>
     <div class="sc-nums">
       <div><span class="sc-lbl">${t('hist.total')}</span><span class="sc-val">${fmt(s.total)}</span></div>
@@ -588,7 +593,7 @@ function applyAdj(){
   alert('Stock updated successfully!\n'+adjSelProd.name+': '+before+' → '+adjSelProd.stock);
 }
 function renderAdjLog(){
-  D('adj-log').innerHTML=adjLog.length?adjLog.map(l=>`<div style="padding:7px 0;border-bottom:1px solid #f1f5f9">
+  D('adj-log').innerHTML=adjLog.length?adjLog.map(l=>`<div style="padding:7px 0;border-bottom:1px solid var(--border-light)">
     <div style="display:flex;justify-content:space-between">
       <span style="font-weight:600;font-size:12px">${l.prod}</span>
       <span class="badge ${l.type==='add'?'bok':l.type==='sub'?'bout':'blow'}">${l.type==='add'?'+'+l.qty:l.type==='sub'?'-'+l.qty:'Set '+l.qty}</span>
@@ -599,7 +604,7 @@ function renderAdjLog(){
 }
 function renderLowStockList(){
   const list=prods.filter(p=>p.stock<=p.alert).sort((a,b)=>a.stock-b.stock);
-  D('low-stock-list').innerHTML=list.length?list.map(p=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1f5f9;align-items:center">
+  D('low-stock-list').innerHTML=list.length?list.map(p=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-light);align-items:center">
     <div>
       <div style="font-weight:600;font-size:12px">${p.name}</div>
       <div style="font-size:11px;color:var(--text-muted)">${p.sku} &bull; ${tCat(p.cat)} &bull; ${p.brand}</div>
@@ -620,27 +625,27 @@ function xlsxDown(filename,sheets){
 
 function exportInventory(){
   const hdr=['ID','Product Name','SKU','Category','Brand','Selling Price (₹)','Cost Price (₹)','Stock Qty','Low Stock Alert','GST %','Warranty (months)','Margin %','Status'];
-  xlsxDown('ElectroShop_Inventory.xlsx',[{name:'Inventory',data:[hdr,...prods.map(p=>[p.id,p.name,p.sku,p.cat,p.brand||'',Math.round(p.sp),Math.round(p.cp),p.stock,p.alert,p.gst,p.war||0,(((p.sp-p.cp)/p.sp)*100).toFixed(1)+'%',p.stock===0?'Out of Stock':p.stock<=p.alert?'Low Stock':'In Stock'])]}]);
+  xlsxDown('ArariaDistributers_Inventory.xlsx',[{name:'Inventory',data:[hdr,...prods.map(p=>[p.id,p.name,p.sku,p.cat,p.brand||'',Math.round(p.sp),Math.round(p.cp),p.stock,p.alert,p.gst,p.war||0,(((p.sp-p.cp)/p.sp)*100).toFixed(1)+'%',p.stock===0?'Out of Stock':p.stock<=p.alert?'Low Stock':'In Stock'])]}]);
 }
 
 function exportSalesXLSX(){
   const hdr=['Invoice','Date','Time','Customer','Phone','Product','Qty','Unit Price','Discount%','GST%','Item Subtotal','GST Amount','Item Total','Profit','Payment','Notes'];
   const rows=[];
   sales.forEach(s=>s.items.forEach(i=>rows.push([s.id,new Date(s.date).toLocaleDateString('en-IN'),new Date(s.date).toLocaleTimeString('en-IN'),s.customer,s.phone||'',i.name,i.qty,Math.round(i.price),i.disc,i.gst,Math.round(itemNet(i)),Math.round(itemGSTAmt(i)),Math.round(itemTotal(i)),Math.round(itemProfit(i)),s.payment,s.notes||''])));
-  xlsxDown('ElectroShop_Sales.xlsx',[{name:'Sales',data:[hdr,...rows]}]);
+  xlsxDown('ArariaDistributers_Sales.xlsx',[{name:'Sales',data:[hdr,...rows]}]);
 }
 
 function exportLowStock(){
   const hdr=['Product Name','SKU','Category','Brand','Selling Price','Cost Price','Current Stock','Alert Level','Status'];
   const rows=prods.filter(p=>p.stock<=p.alert);
-  xlsxDown('ElectroShop_LowStock.xlsx',[{name:'Low Stock',data:[hdr,...rows.map(p=>[p.name,p.sku,p.cat,p.brand||'',Math.round(p.sp),Math.round(p.cp),p.stock,p.alert,p.stock===0?'Out of Stock':'Low Stock'])]}]);
+  xlsxDown('ArariaDistributers_LowStock.xlsx',[{name:'Low Stock',data:[hdr,...rows.map(p=>[p.name,p.sku,p.cat,p.brand||'',Math.round(p.sp),Math.round(p.cp),p.stock,p.alert,p.stock===0?'Out of Stock':'Low Stock'])]}]);
 }
 
 function exportProfit(){
   const pm={};
   sales.forEach(s=>s.items.forEach(i=>{if(!pm[i.id])pm[i.id]={name:i.name,sold:0,rev:0,profit:0};pm[i.id].sold+=i.qty;pm[i.id].rev+=itemTotal(i);pm[i.id].profit+=itemProfit(i);}));
   const hdr=['Product','Category','Brand','Selling Price','Cost Price','Margin%','Units Sold','Total Revenue','Total Profit'];
-  xlsxDown('ElectroShop_Profit.xlsx',[{name:'Profit Report',data:[hdr,...prods.map(p=>{const s=pm[p.id]||{sold:0,rev:0,profit:0};return[p.name,p.cat,p.brand||'',Math.round(p.sp),Math.round(p.cp),(((p.sp-p.cp)/p.sp)*100).toFixed(1)+'%',s.sold,Math.round(s.rev),Math.round(s.profit)];})]}]);
+  xlsxDown('ArariaDistributers_Profit.xlsx',[{name:'Profit Report',data:[hdr,...prods.map(p=>{const s=pm[p.id]||{sold:0,rev:0,profit:0};return[p.name,p.cat,p.brand||'',Math.round(p.sp),Math.round(p.cp),(((p.sp-p.cp)/p.sp)*100).toFixed(1)+'%',s.sold,Math.round(s.rev),Math.round(s.profit)];})]}]);
 }
 
 function exportLastReceipt(){

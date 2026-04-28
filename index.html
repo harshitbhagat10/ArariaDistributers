@@ -219,7 +219,7 @@
       <div class="card">
         <div class="card-title" data-i18n="bill.items">Bill Items</div>
         <div id="bill-list"><p style="color:#94a3b8;padding:8px 0">No items added yet.</p></div>
-        <div id="bill-summary" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb"></div>
+        <div id="bill-summary" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"></div>
       </div>
     </div>
     <div>
@@ -290,7 +290,7 @@
   <div class="card">
     <div class="card-title" data-i18n="rep.title">Daily Sales Report</div>
     <div class="tbar" style="margin:0">
-      <input type="date" id="rep-date" style="font-size:12px;padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;color:#1a1a2e">
+      <input type="date" id="rep-date" style="font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;color:var(--text);background:var(--surface)">
       <button class="btn btp" onclick="renderReport()" data-i18n="rep.view">View Report</button>
       <button class="btn bte" onclick="exportDayXLSX()" data-i18n="rep.exportday">Export Day (Excel)</button>
       <button class="btn bto" onclick="exportMonthXLSX()" data-i18n="rep.exportmonth">Export Month (Excel)</button>
@@ -307,7 +307,7 @@
       <div class="card">
         <div class="card-title" data-i18n="staff.markatt">&#128197; Mark Attendance &mdash;</div> <span id="att-date-label"></span>
         <div class="tbar" style="margin-bottom:10px">
-          <input type="date" id="att-date" style="font-size:12px;padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;color:#1a1a2e" onchange="renderAttendance()">
+          <input type="date" id="att-date" style="font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;color:var(--text);background:var(--surface)" onchange="renderAttendance()">
           <button class="btn btp" onclick="renderAttendance()" data-i18n="staff.load">Load</button>
           <button class="btn bts" onclick="saveAttendance()" data-i18n="staff.saveatt">Save Attendance</button>
           <button class="btn bte" onclick="exportAttendanceXLSX()" style="margin-left:auto" data-i18n="staff.export">Export (Excel)</button>
@@ -324,7 +324,7 @@
       <div class="card">
         <div class="card-title" data-i18n="staff.manage">&#128101; Manage Staff</div>
         <div id="staff-list" style="max-height:320px;overflow-y:auto;margin-bottom:10px"></div>
-        <div style="border-top:1px solid #e5e7eb;padding-top:10px">
+        <div style="border-top:1px solid var(--border);padding-top:10px">
           <div class="card-title" style="font-size:12px" data-i18n="staff.addnew">Add New Staff</div>
           <div class="r2">
             <div><label data-i18n="staff.fullname">Full Name *</label><input id="new-staff-name" placeholder="Staff full name"></div>
@@ -362,7 +362,7 @@
           <div id="adj-sugg" class="sugg-box"></div>
         </div>
         <div id="adj-selected" style="display:none">
-          <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;padding:8px 10px;margin-bottom:8px;font-weight:600;font-size:12px;color:#0369a1" id="adj-name"></div>
+          <div style="background:var(--info-bg);border:1px solid var(--info-border);border-radius:6px;padding:8px 10px;margin-bottom:8px;font-weight:600;font-size:12px;color:var(--info)" id="adj-name"></div>
           <div class="r3" style="margin-bottom:8px">
             <div><label data-i18n="admin.curstock">Current Stock</label><input id="adj-cur" readonly></div>
             <div><label data-i18n="admin.adjtype">Adjustment Type</label>
@@ -387,23 +387,23 @@
       <div class="card">
         <div class="card-title" data-i18n="admin.exportdata">&#8681; Export Data</div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.fullinv">Full Inventory</div><div style="font-size:11px;color:#64748b" data-i18n="admin.fullinv.desc">All products, prices, stock levels</div></div>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.fullinv">Full Inventory</div><div style="font-size:11px;color:var(--text-muted)" data-i18n="admin.fullinv.desc">All products, prices, stock levels</div></div>
           <button class="btn bte" onclick="exportInventory()" data-i18n="admin.excel">Excel</button>
         </div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.allsales">All Sales</div><div style="font-size:11px;color:#64748b" data-i18n="admin.allsales.desc">Complete transaction history</div></div>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.allsales">All Sales</div><div style="font-size:11px;color:var(--text-muted)" data-i18n="admin.allsales.desc">Complete transaction history</div></div>
           <button class="btn bte" onclick="exportSalesXLSX()" data-i18n="admin.excel">Excel</button>
         </div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.lowstock">Low Stock Report</div><div style="font-size:11px;color:#64748b" data-i18n="admin.lowstock.desc">Products needing reorder</div></div>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.lowstock">Low Stock Report</div><div style="font-size:11px;color:var(--text-muted)" data-i18n="admin.lowstock.desc">Products needing reorder</div></div>
           <button class="btn bto" onclick="exportLowStock()" data-i18n="admin.excel">Excel</button>
         </div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.profitrep">Profit Report</div><div style="font-size:11px;color:#64748b" data-i18n="admin.profitrep.desc">Revenue, cost &amp; profit per product</div></div>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.profitrep">Profit Report</div><div style="font-size:11px;color:var(--text-muted)" data-i18n="admin.profitrep.desc">Revenue, cost &amp; profit per product</div></div>
           <button class="btn bts" onclick="exportProfit()" data-i18n="admin.excel">Excel</button>
         </div>
         <div class="export-row">
-          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.adjlogrep">Adjustment Log</div><div style="font-size:11px;color:#64748b" data-i18n="admin.adjlogrep.desc">All manual stock changes</div></div>
+          <div><div style="font-weight:600;margin-bottom:2px" data-i18n="admin.adjlogrep">Adjustment Log</div><div style="font-size:11px;color:var(--text-muted)" data-i18n="admin.adjlogrep.desc">All manual stock changes</div></div>
           <button class="btn" onclick="exportAdjLog()" data-i18n="admin.excel">Excel</button>
         </div>
       </div>
@@ -442,7 +442,7 @@
 </div><!-- end app-shell -->
 
 <!-- ==================== EDIT SALE MODAL ==================== -->
-<div id="edit-sale-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)">
+<div id="edit-sale-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;align-items:center;justify-content:center">
   <div style="background:var(--surface,#fff);border-radius:var(--radius-lg,14px);padding:28px 26px;width:520px;max-width:94vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg,0 10px 25px rgba(0,0,0,.15));border:1px solid var(--border,#e2e8f0)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
       <div style="font-size:15px;font-weight:700;color:var(--text,#1e293b)"><span data-i18n="edit.title">&#9998; Edit Sale &mdash;</span> <span id="edit-sale-id" style="color:var(--primary,#6366f1)"></span></div>
