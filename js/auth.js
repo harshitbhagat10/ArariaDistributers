@@ -136,7 +136,10 @@ function enterApp() {
   if (!currentUser) return;
   document.getElementById('auth-overlay').style.display = 'none';
   document.getElementById('app-shell').classList.add('visible');
-  document.getElementById('topbar-info').textContent = currentUser.name;
+  // Populate profile avatar & dropdown
+  const initials = currentUser.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  document.getElementById('topbar-initials').textContent = initials;
+  document.getElementById('pm-name').textContent = currentUser.name;
   const badge = document.getElementById('topbar-role');
   badge.textContent = currentUser.role;
   badge.className = 'user-badge ' + currentUser.role;

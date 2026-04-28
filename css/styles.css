@@ -250,13 +250,23 @@ tr:hover td{background:var(--primary-light)}
 /* ==================== TOPBAR USER ==================== */
 .topbar-user{display:flex;align-items:center;gap:10px}
 .topbar-user span{font-size:11px;opacity:.8}
-.topbar-user #topbar-info,.topbar-user #topbar-role{cursor:pointer;transition:var(--transition)}
-.topbar-user #topbar-info:hover,.topbar-user #topbar-role:hover{opacity:1}
-.topbar-user .user-badge{background:rgba(255,255,255,.1);padding:4px 12px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;backdrop-filter:blur(8px)}
+.topbar-user .user-badge{background:rgba(255,255,255,.1);padding:3px 10px;border-radius:99px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
 .topbar-user .user-badge.admin{background:rgba(251,191,35,.15);color:#fbbf24}
 .topbar-user .user-badge.staff{background:rgba(96,165,250,.15);color:#93c5fd}
-.logout-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff;padding:7px 16px;border-radius:99px;font-size:11px;cursor:pointer;font-family:var(--font);transition:var(--transition);font-weight:600;backdrop-filter:blur(8px)}
-.logout-btn:hover{background:rgba(255,255,255,.15)}
+
+/* ==================== PROFILE DROPDOWN ==================== */
+.profile-dropdown{position:relative}
+.profile-avatar-btn{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.2);background:linear-gradient(135deg,var(--primary),var(--purple));color:#fff;font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);padding:0;line-height:1;letter-spacing:.5px}
+.profile-avatar-btn:hover{border-color:rgba(255,255,255,.45);transform:scale(1.06)}
+.profile-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);min-width:200px;z-index:300;padding:6px 0;animation:fadeIn .15s ease}
+.profile-menu.open{display:block}
+.pm-header{padding:12px 16px;border-bottom:1px solid var(--border-light)}
+.pm-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.pm-item{display:flex;align-items:center;gap:8px;width:100%;border:none;background:none;padding:10px 16px;font-size:13px;font-family:var(--font);color:var(--text);cursor:pointer;transition:var(--transition);text-align:left;font-weight:500}
+.pm-item:hover{background:var(--primary-light)}
+.pm-logout{color:var(--danger)}
+.pm-logout:hover{background:var(--danger-bg)}
+.pm-divider{height:1px;background:var(--border-light);margin:4px 0}
 
 /* ==================== THEME TOGGLE ==================== */
 .theme-toggle{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:var(--transition);backdrop-filter:blur(8px);padding:0;line-height:1}
@@ -369,14 +379,15 @@ tr:hover td{background:var(--primary-light)}
 @media(max-width:640px){
 
   /* --- TOPBAR --- */
-  .topbar{padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));position:-webkit-sticky;position:sticky;top:0;z-index:200}
+  .topbar{padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top));position:-webkit-sticky;position:sticky;top:0;z-index:200}
   .topbar h1{font-size:15px}
-  .topbar-user{gap:8px}
+  .topbar-user{gap:6px}
   .topbar-user span{font-size:10px}
-  .topbar-user #topbar-info{max-width:80px;overflow:hidden;text-overflow:ellipsis}
-  .logout-btn{padding:5px 10px;font-size:10px}
-  .theme-toggle{width:30px;height:30px;font-size:14px}
-  .lang-toggle{height:28px;font-size:10px;padding:0 10px}
+  .topbar-user #connection-status{display:none}
+  .profile-avatar-btn{width:30px;height:30px;font-size:11px}
+  .profile-menu{right:-4px;min-width:180px}
+  .theme-toggle{width:28px;height:28px;font-size:13px}
+  .lang-toggle{height:26px;font-size:9px;padding:0 8px}
 
   /* --- HIDE DESKTOP TABS, SHOW BOTTOM NAV --- */
   .tabs{display:none!important}
@@ -388,11 +399,11 @@ tr:hover td{background:var(--primary-light)}
     bottom:0;left:0;right:0;
     background:var(--surface-glass);
     border-top:1px solid var(--border);
-    padding:4px 0 calc(6px + env(safe-area-inset-bottom,0px));
+    padding:6px 12px calc(8px + env(safe-area-inset-bottom,0px));
     z-index:200;
     box-shadow:0 -4px 20px rgba(0,0,0,.06);
-    justify-content:space-around;
-    -webkit-justify-content:space-around;
+    justify-content:space-between;
+    -webkit-justify-content:space-between;
     backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   }
   .mnav-btn{
@@ -402,15 +413,18 @@ tr:hover td{background:var(--primary-light)}
     -webkit-justify-content:center;justify-content:center;
     border:none;background:none;cursor:pointer;
     color:var(--text-muted);font-family:var(--font);
-    padding:6px 4px 4px;min-width:56px;
-    transition:var(--transition);gap:2px;
+    padding:6px 0 4px;flex:1;
+    transition:color .2s,background .2s;gap:3px;
     border-radius:var(--radius-sm);
     -webkit-touch-callout:none;
     touch-action:manipulation;
+    position:relative;
   }
-  .mnav-btn.active,.mnav-btn:active{color:var(--primary)}
-  .mnav-icon{font-size:20px;line-height:1}
-  .mnav-text{font-size:9px;font-weight:700;letter-spacing:.2px}
+  .mnav-btn.active{color:var(--primary)}
+  .mnav-btn.active .mnav-icon{transform:scale(1.1)}
+  .mnav-btn.active::after{content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:var(--primary);border-radius:99px}
+  .mnav-icon{font-size:18px;line-height:1;transition:transform .2s}
+  .mnav-text{font-size:9px;font-weight:600;letter-spacing:.1px;margin-top:1px}
 
   /* Mobile overflow menu */
   .mobile-menu{
@@ -559,6 +573,7 @@ tr:hover td{background:var(--primary-light)}
   .r4{grid-template-columns:1fr}
   .topbar h1{font-size:13px}
   .att-status{grid-template-columns:1fr 1fr}
-  .mnav-btn{min-width:48px}
+  .mnav-btn{flex:1}
   .mnav-text{font-size:8px}
+  .mnav-icon{font-size:16px}
 }

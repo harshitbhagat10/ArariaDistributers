@@ -69,9 +69,20 @@
     <span id="connection-status" style="font-size:10px;margin-right:6px"></span>
     <button class="lang-toggle" onclick="toggleLang()" id="lang-btn" title="English / हिंदी">EN</button>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="theme-btn">&#9790;</button>
-    <span id="topbar-info" style="cursor:pointer" onclick="showTab('profile')"></span>
-    <span class="user-badge" id="topbar-role" style="cursor:pointer" onclick="showTab('profile')"></span>
-    <button class="logout-btn" onclick="doLogout()" data-i18n="topbar.logout">Logout</button>
+    <div class="profile-dropdown" id="profile-dropdown">
+      <button class="profile-avatar-btn" onclick="toggleProfileMenu()" id="profile-avatar-btn" title="Profile">
+        <span id="topbar-initials">U</span>
+      </button>
+      <div class="profile-menu" id="profile-menu">
+        <div class="pm-header">
+          <div class="pm-name" id="pm-name"></div>
+          <span class="user-badge" id="topbar-role"></span>
+        </div>
+        <button class="pm-item" onclick="showTab('profile');closeProfileMenu()">&#128100; <span data-i18n="mmenu.profile">My Profile</span></button>
+        <div class="pm-divider"></div>
+        <button class="pm-item pm-logout" onclick="doLogout()">&#9211; <span data-i18n="topbar.logout">Logout</span></button>
+      </div>
+    </div>
   </div>
 </div>
 

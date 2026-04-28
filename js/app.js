@@ -39,6 +39,18 @@ function toggleTheme(){
 }
 (function(){const saved=localStorage.getItem('electroshop_theme');if(saved)applyTheme(saved);})();
 
+// ==================== PROFILE DROPDOWN ====================
+function toggleProfileMenu(){
+  D('profile-menu').classList.toggle('open');
+}
+function closeProfileMenu(){
+  D('profile-menu').classList.remove('open');
+}
+document.addEventListener('click',function(e){
+  const dd=document.getElementById('profile-dropdown');
+  if(dd&&!dd.contains(e.target))closeProfileMenu();
+});
+
 // ==================== TAB NAVIGATION ====================
 const tabMap={dash:0,inv:1,bill:2,hist:3,report:4,staff:5,admin:6,perf:7,profile:8};
 
